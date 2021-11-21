@@ -31,16 +31,13 @@ import static mx.parrot.commonapis.exception.ErrorCodes.PARR_REST_ORD_007;
 import static mx.parrot.commonapis.exception.ErrorCodes.PARR_REST_ORD_008;
 import static mx.parrot.commonapis.exception.ErrorCodes.PARR_REST_ORD_009;
 import static mx.parrot.commonapis.exception.ErrorCodes.PARR_REST_ORD_010;
-import static mx.parrot.commonapis.exception.ErrorCodes.PARR_REST_ORD_012;
 import static mx.parrot.commonapis.exception.ErrorCodes.PARR_REST_ORD_013;
 import static mx.parrot.commonapis.exception.ErrorCodes.PARR_REST_ORD_014;
 import static mx.parrot.commonapis.exception.ErrorCodes.PARR_REST_ORD_015;
-import static mx.parrot.commonapis.exception.ErrorCodes.PARR_REST_ORD_016;
 import static mx.parrot.commonapis.factory.CommonApisFactory.getOrdersDao;
 import static mx.parrot.commonapis.factory.CommonApisFactory.getParrotRequest;
 import static mx.parrot.commonapis.util.ConstantsEnum.X_PARROT_CLIENT_ID;
 import static mx.parrot.commonapis.util.ConstantsEnum.X_PARROT_DEVICE;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -76,14 +73,7 @@ class OrderServiceTest {
         when(ordersHelperService.createOrUpdateOrder(any())).thenReturn(Mono.just(getOrdersDao()));
 
         StepVerifier.create(orderService.updateOrder(getParrotRequest()))
-                .assertNext(orderResponse -> {
-                            assertNull(orderResponse.getCustomer());
-                            assertNull(orderResponse.getOrder());
-                            assertNull(orderResponse.getIdempotentReference());
-                            assertNull(orderResponse.getCreate_time());
-                            assertNull(orderResponse.getStatus());
-                        }
-                ).verifyComplete();
+                .assertNext(Assertions::assertNotNull).verifyComplete();
 
     }
 
@@ -94,14 +84,8 @@ class OrderServiceTest {
         when(ordersHelperService.createOrUpdateOrder(any())).thenReturn(Mono.just(getOrdersDao()));
 
         StepVerifier.create(orderService.updateOrder(getParrotRequest()))
-                .assertNext(orderResponse -> {
-                            assertNull(orderResponse.getCustomer());
-                            assertNull(orderResponse.getOrder());
-                            assertNull(orderResponse.getIdempotentReference());
-                            assertNull(orderResponse.getCreate_time());
-                            assertNull(orderResponse.getStatus());
-                        }
-                ).verifyComplete();
+                .assertNext(Assertions::assertNotNull).verifyComplete();
+
 
     }
 

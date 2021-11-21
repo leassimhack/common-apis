@@ -60,6 +60,8 @@ public class CommonApisFactory {
                 .setCustomer(new Customer()
                         .setFirstName("Ismael")
                         .setLastName("Vazquez")
+                        .setMiddleName("Esteban")
+                        .setMaidenName("Flores")
 
                 )
                 .setOrder(new Order()
@@ -87,7 +89,8 @@ public class CommonApisFactory {
 
                 )
                 .setCreate_time(LocalDateTime.now())
-                .setStatus("CREATED");
+                .setStatus("CREATED")
+                .setIdempotentReference("423423423");
 
 
     }
@@ -122,6 +125,7 @@ public class CommonApisFactory {
         user.setEmail("example@gmail.com");
         user.setName("Ismael");
         user.setCreatedTime(LocalDateTime.now());
+        user.setPassword("5435345");
 
         return user;
     }

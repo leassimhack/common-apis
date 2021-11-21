@@ -52,7 +52,30 @@ class OrderControllerTest {
                 1
         ).block();
 
-        assertNotNull(result);
+        assertNotNull(result.getBody());
+        assertNotNull(result.getBody().toString());
+        assertNotNull(result.getBody().getStatus());
+        assertNotNull(result.getBody().getCreate_time());
+        assertNotNull(result.getBody().getIdempotentReference());
+        assertNotNull(result.getBody().getOrder());
+        assertNotNull(result.getBody().getOrder().toString());
+        assertNotNull(result.getBody().getOrder().getTotal_amount());
+        assertNotNull(result.getBody().getOrder().getTotal_amount().toString());
+        assertNotNull(result.getBody().getOrder().getTotal_amount().getValue());
+        assertNotNull(result.getBody().getOrder().getTotal_amount().getCurrency());
+        assertNotNull(result.getBody().getOrder().getProducts());
+        assertNotNull(result.getBody().getOrder().getProducts().toString());
+        assertNotNull(result.getBody().getOrder().getProducts().get(0).getAmount().getValue());
+        assertNotNull(result.getBody().getOrder().getProducts().get(0).getAmount().getCurrency());
+        assertNotNull(result.getBody().getOrder().getProducts().get(0).getQuantity());
+        assertNotNull(result.getBody().getOrder().getProducts().get(0).getName());
+        assertNotNull(result.getBody().getOrder().getProducts().get(0).getId_product());
+        assertNotNull(result.getBody().getCustomer().toString());
+        assertNotNull(result.getBody().getCustomer().getFirstName());
+        assertNotNull(result.getBody().getCustomer().getLastName());
+        assertNotNull(result.getBody().getCustomer().getMaidenName());
+        assertNotNull(result.getBody().getCustomer().getMiddleName());
+
     }
 
     @Test

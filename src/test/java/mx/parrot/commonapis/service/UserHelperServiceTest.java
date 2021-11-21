@@ -13,6 +13,7 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 import static mx.parrot.commonapis.factory.CommonApisFactory.getUserDao;
+import static org.junit.Assert.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
@@ -37,7 +38,13 @@ class UserHelperServiceTest {
         when(usersRepository.findByEmail(anyString())).thenReturn(Mono.just(getUserDao()));
 
         StepVerifier.create(userHelperService.getUsers("1"))
-                .assertNext(Assertions::assertNotNull).verifyComplete();
+                .assertNext(user -> {
+                            assertNotNull(user.getId());
+                            assertNotNull(user.getCreatedTime());
+                            assertNotNull(user.getEmail());
+                            assertNotNull(user.getPassword());
+                        }
+                ).verifyComplete();
 
     }
 

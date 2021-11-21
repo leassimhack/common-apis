@@ -14,6 +14,8 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 import static mx.parrot.commonapis.factory.CommonApisFactory.getOrdersDao;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.verify;
@@ -49,7 +51,16 @@ class OrderHelperServiceTest {
         when(ordersRepository.save(any())).thenReturn(Mono.just(getOrdersDao()));
 
         StepVerifier.create(ordersHelperService.createOrUpdateOrder(getOrdersDao()))
-                .assertNext(Assertions::assertNotNull).verifyComplete();
+                .assertNext(orders -> {
+                            assertNotNull(orders.getId());
+                            assertNotNull(orders.getCurrency());
+                            assertNotNull(orders.getNameCustomer());
+                            assertNotNull(orders.getStatus());
+                            assertNotNull(orders.getCreatedTime());
+                            assertEquals(10.0d, orders.getTotalAmount());
+                            assertEquals(1, orders.getIdUser());
+                        }
+                ).verifyComplete();
     }
 
     @Test
