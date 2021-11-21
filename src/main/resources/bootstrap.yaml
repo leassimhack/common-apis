@@ -1,0 +1,12 @@
+spring:
+  application:
+    name: demo
+
+#  cloud:
+#    config:
+#      uri: http://config-service:8080
+#      name: mx-fx-fixing-global-${SPRING_PROFILES_ACTIVE}-fx-fixing-service
+#      enabled: true
+#      label: master
+#      profile: ${SPRING_PROFILES_ACTIVE}
+#      allow-override: true
