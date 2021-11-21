@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -63,6 +64,7 @@ public class OrderService implements IOrderService {
 
                 })
                 .flatMap(orders -> ordersService.createOrUpdateOrder(orders))
+                .flatMap(orders ->  saveProducts(orders,request))
                 .flatMap(orders -> Mono.just(new OrderResponse()));
 
 
@@ -86,7 +88,6 @@ public class OrderService implements IOrderService {
         }
 
         return Mono.just(idOrder);
-
 
     }
 
