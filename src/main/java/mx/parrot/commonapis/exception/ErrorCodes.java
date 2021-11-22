@@ -44,7 +44,9 @@ public enum ErrorCodes {
 
     PARR_REST_US_018("PARR_REST_ORD_018", "Error, the field 'email' must not be null"),
 
-    PARR_REST_US_019("PARR_REST_ORD_019", "Error, the 'email' entered already exists");
+    PARR_REST_US_019("PARR_REST_ORD_019", "Error, the 'email' entered already exists"),
+
+    PARR_REST_ORD_020("PARR_REST_ORD_020", "Error, the header X-User-Id must not be null or empty");
 
     private String code;
 

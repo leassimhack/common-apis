@@ -18,7 +18,6 @@ public class Orders implements Persistable<Integer> {
 
     @Id
     private Integer id;
-    private String hashOrder;
     private String nameCustomer;
     private double totalAmount;
     private String currency;
@@ -33,7 +32,7 @@ public class Orders implements Persistable<Integer> {
     @Transient
     public boolean isNew() {
 
-        return id != null && status.equals("CREATED");
+        return  status.equals("CREATED");
     }
 
 }

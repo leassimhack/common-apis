@@ -28,7 +28,7 @@ public interface IOrderController {
             @RequestHeader(value = "Authorization", required = false) String authorization,
             final UriComponentsBuilder builder,
             @RequestHeader(value = "X-B3-TraceId", required = false) String xB3TraceId,
-            @RequestHeader(value = "User-Id", required = false) Integer userID,
+            @RequestHeader(value = "X-User-Id", required = false) Integer userID,
             @RequestHeader(value = "X-Parrot-Device", required = false) String xParrotDevice
     );
 
@@ -41,7 +41,7 @@ public interface IOrderController {
             @RequestHeader(value = "Authorization", required = false) String authorization,
             @Valid @RequestBody OrderRequest orderRequest,
             @RequestHeader(value = "X-B3-TraceId", required = false) String xB3TraceId,
-            @RequestHeader(value = "User-Id", required = false) Integer userID,
+            @RequestHeader(value = "X-User-Id", required = false) Integer userID,
             @RequestHeader(value = "X-Parrot-Device", required = false) String xParrotDevice,
             @PathVariable("order_id") Integer orderId
     );

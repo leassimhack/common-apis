@@ -8,7 +8,7 @@ import reactor.core.publisher.Flux;
 
 public interface ProductsRepository extends ReactiveCrudRepository<Products, Integer> {
 
-    @Query("select * from users c where c.id_order = :id_order")
+    @Query("select * from products c where c.id_order = :id_order")
     Flux<Products> findByIdOrder(Integer idOrder);
 
 

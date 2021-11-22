@@ -33,8 +33,8 @@ import static mx.parrot.commonapis.exception.ErrorCodes.PARR_REST_ORD_010;
 import static mx.parrot.commonapis.exception.ErrorCodes.PARR_REST_ORD_011;
 import static mx.parrot.commonapis.exception.ErrorCodes.PARR_REST_ORD_013;
 import static mx.parrot.commonapis.exception.ErrorCodes.PARR_REST_ORD_014;
-import static mx.parrot.commonapis.exception.ErrorCodes.PARR_REST_ORD_015;
 import static mx.parrot.commonapis.exception.ErrorCodes.PARR_REST_ORD_016;
+import static mx.parrot.commonapis.exception.ErrorCodes.PARR_REST_ORD_020;
 import static mx.parrot.commonapis.util.ConstantsEnum.X_PARROT_CLIENT_ID;
 import static mx.parrot.commonapis.util.ConstantsEnum.X_PARROT_DEVICE;
 import static mx.parrot.commonapis.util.Util.replaceMessage;
@@ -47,14 +47,12 @@ public class OrderValidation {
 
     public static Mono<Boolean> validateUpdateOrder(final ParrotRequest<OrderRequest> parrotRequest) {
 
+        if (StringUtils.isBlank(parrotRequest.getUserId().toString())) {
+            return Mono.error(new ParrotExceptions(PARR_REST_ORD_020.getCode(), PARR_REST_ORD_020.getMessage(), BAD_REQUEST));
+        }
+
         return validateHeaders(parrotRequest.getHeaders())
                 .flatMap(headerOk -> validateBody(parrotRequest.getBody()));
-
-    }
-
-    public static Mono<Boolean> validateCreateOrder(final ParrotRequest<OrderRequest> parrotRequest) {
-
-        return validateHeaders(parrotRequest.getHeaders());
 
     }
 
@@ -79,10 +77,6 @@ public class OrderValidation {
 
 
         try {
-
-            Optional.of(request).map(OrderRequest::getIdempotentReference)
-                    .filter(s -> !StringUtils.isBlank(s))
-                    .orElseThrow(() -> new ParrotExceptions(PARR_REST_ORD_015.getCode(), PARR_REST_ORD_015.getMessage(), BAD_REQUEST));
 
             Optional.of(request)
                     .map(OrderRequest::getCustomer)

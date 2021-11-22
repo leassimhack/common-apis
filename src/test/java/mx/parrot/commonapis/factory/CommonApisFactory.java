@@ -25,7 +25,6 @@ public class CommonApisFactory {
     public static OrderRequest getOrderRequest() {
 
         return new OrderRequest()
-                .setIdempotentReference("331232132")
                 .setCustomer(new Customer()
                         .setFirstName("Ismael")
                         .setLastName("Vazquez")
@@ -72,14 +71,14 @@ public class CommonApisFactory {
                         )
                         .setProducts(Arrays.asList(
                                 new Product()
-                                        .setId_product("1")
+                                        .setId(1)
                                         .setAmount(new Amount()
                                                 .setValue(BigDecimal.valueOf(1))
                                                 .setCurrency("MXP"))
                                         .setName("Coffe")
                                         .setQuantity(1),
                                 new Product()
-                                        .setId_product("1")
+                                        .setId(1)
                                         .setAmount(new Amount()
                                                 .setValue(BigDecimal.valueOf(1))
                                                 .setCurrency("MXP"))
@@ -89,8 +88,7 @@ public class CommonApisFactory {
 
                 )
                 .setCreate_time(LocalDateTime.now())
-                .setStatus("CREATED")
-                .setIdempotentReference("423423423");
+                .setStatus("CREATED");
 
 
     }
@@ -130,11 +128,23 @@ public class CommonApisFactory {
         return user;
     }
 
+    public static mx.parrot.commonapis.dao.entity.Products getProductsDao() {
+
+        final mx.parrot.commonapis.dao.entity.Products products = new mx.parrot.commonapis.dao.entity.Products();
+        products.setId(1);
+        products.setName("Coffe");
+        products.setCreatedTime(LocalDateTime.now());
+        products.setQuantity(2);
+        products.setCurrency("MXN");
+        products.setAmount(2.0d);
+
+        return products;
+    }
+
     public static Orders getOrdersDao() {
         Orders orders = new Orders();
 
         orders.setId(21312312);
-        orders.setHashOrder("435345345345345");
         orders.setNameCustomer("Ismael Vazquez");
         orders.setTotalAmount(10.0d);
         orders.setCurrency("MXN");

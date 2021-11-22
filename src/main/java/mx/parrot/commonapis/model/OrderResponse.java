@@ -1,5 +1,6 @@
 package mx.parrot.commonapis.model;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
@@ -14,12 +15,10 @@ import java.time.LocalDateTime;
 @Setter
 @ToString
 @Accessors(chain = true)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class OrderResponse implements Serializable {
 
     private static final long serialVersionUID = 4688242599582361864L;
-
-    @JsonProperty("idempotentReference")
-    private String idempotentReference;
 
     @JsonProperty("customer")
     private Customer customer;

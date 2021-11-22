@@ -17,9 +17,6 @@ public class OrderRequest implements Serializable {
 
     private static final long serialVersionUID = 4688242599582361864L;
 
-    @JsonProperty("idempotentReference")
-    private String idempotentReference;
-
     @JsonProperty("customer")
     private Customer customer;
 

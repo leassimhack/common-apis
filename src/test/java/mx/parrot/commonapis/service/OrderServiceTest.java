@@ -14,6 +14,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
@@ -33,9 +34,9 @@ import static mx.parrot.commonapis.exception.ErrorCodes.PARR_REST_ORD_009;
 import static mx.parrot.commonapis.exception.ErrorCodes.PARR_REST_ORD_010;
 import static mx.parrot.commonapis.exception.ErrorCodes.PARR_REST_ORD_013;
 import static mx.parrot.commonapis.exception.ErrorCodes.PARR_REST_ORD_014;
-import static mx.parrot.commonapis.exception.ErrorCodes.PARR_REST_ORD_015;
 import static mx.parrot.commonapis.factory.CommonApisFactory.getOrdersDao;
 import static mx.parrot.commonapis.factory.CommonApisFactory.getParrotRequest;
+import static mx.parrot.commonapis.factory.CommonApisFactory.getProductsDao;
 import static mx.parrot.commonapis.util.ConstantsEnum.X_PARROT_CLIENT_ID;
 import static mx.parrot.commonapis.util.ConstantsEnum.X_PARROT_DEVICE;
 import static org.mockito.ArgumentMatchers.any;
@@ -49,6 +50,9 @@ class OrderServiceTest {
 
     @Mock
     private OrdersHelperService ordersHelperService;
+
+    @Mock
+    private ProductsHelperService productsHelperService;
 
     @BeforeEach
     void setUp() {
@@ -72,6 +76,9 @@ class OrderServiceTest {
         when(ordersHelperService.getOrder(any())).thenReturn(Mono.empty());
         when(ordersHelperService.createOrUpdateOrder(any())).thenReturn(Mono.just(getOrdersDao()));
 
+        when(productsHelperService.saveProducts(any(), any(), any())).thenReturn(Flux.just(getProductsDao()));
+
+
         StepVerifier.create(orderService.updateOrder(getParrotRequest()))
                 .assertNext(Assertions::assertNotNull).verifyComplete();
 
@@ -82,6 +89,7 @@ class OrderServiceTest {
 
         when(ordersHelperService.getOrder(any())).thenReturn(Mono.just(getOrdersDao()));
         when(ordersHelperService.createOrUpdateOrder(any())).thenReturn(Mono.just(getOrdersDao()));
+        when(productsHelperService.saveProducts(any(), any(), any())).thenReturn(Flux.just(getProductsDao()));
 
         StepVerifier.create(orderService.updateOrder(getParrotRequest()))
                 .assertNext(Assertions::assertNotNull).verifyComplete();
@@ -111,18 +119,6 @@ class OrderServiceTest {
         StepVerifier.create(orderService.updateOrder(getParrotRequest().setBody(req)))
                 .expectErrorMatches(throwable -> throwable instanceof ParrotExceptions &&
                         ((ParrotExceptions) throwable).getCode().equals(PARR_REST_ORD_004.getCode()))
-                .verify();
-
-    }
-
-    @Test
-    void createUser_when_IdempotentReference_is_null_expectedException() {
-
-        final OrderRequest req = getParrotRequest().getBody().setIdempotentReference("");
-
-        StepVerifier.create(orderService.updateOrder(getParrotRequest().setBody(req)))
-                .expectErrorMatches(throwable -> throwable instanceof ParrotExceptions &&
-                        ((ParrotExceptions) throwable).getCode().equals(PARR_REST_ORD_015.getCode()))
                 .verify();
 
     }

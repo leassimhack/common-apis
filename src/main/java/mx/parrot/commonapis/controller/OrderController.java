@@ -74,7 +74,7 @@ public class OrderController implements IOrderController {
                         .flatMap(orderResponse -> {
                             log.info("Time of response service /: {}", (System.currentTimeMillis() - initialMillis));
 
-                            log.info("********** End /api/v1/order **********");
+                            log.info("********** End /api/v1/order/{order_id} **********");
                             return Mono.just(new ResponseEntity<>(orderResponse, HttpStatus.OK));
                         }));
     }

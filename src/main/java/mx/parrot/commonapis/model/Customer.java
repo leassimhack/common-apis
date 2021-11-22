@@ -1,5 +1,6 @@
 package mx.parrot.commonapis.model;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
@@ -13,6 +14,7 @@ import java.io.Serializable;
 @Setter
 @ToString
 @Accessors(chain = true)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Customer implements Serializable {
 
     private static final long serialVersionUID = -1808573319388569406L;

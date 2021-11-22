@@ -23,7 +23,7 @@ import static org.apache.commons.lang3.StringUtils.EMPTY;
 public class TransformServiceToDao {
 
 
-    public static Mono<Orders> transformOrderToService(final ParrotRequest<OrderRequest> request, final String status, LocalDateTime createdTime) {
+    public static Mono<Orders> transformOrderToEntity(final ParrotRequest<OrderRequest> request, final String status, LocalDateTime createdTime) {
 
         OrderRequest orderRequest = request.getBody();
 
@@ -66,9 +66,6 @@ public class TransformServiceToDao {
                 .map(Amount::getCurrency)
                 .orElse(EMPTY);
 
-        final String hashOder = Optional.ofNullable(orderRequest)
-                .map(OrderRequest::getIdempotentReference)
-                .orElse(EMPTY);
 
         final Integer idOrder = Optional.ofNullable(orderRequest)
                 .map(OrderRequest::getOrder)
@@ -77,7 +74,6 @@ public class TransformServiceToDao {
 
 
         final Orders order = new Orders();
-        order.setHashOrder(hashOder);
         order.setNameCustomer(nameCustomer);
         order.setTotalAmount(Double.parseDouble(String.valueOf(totalAmount)));
         order.setCurrency(currency);

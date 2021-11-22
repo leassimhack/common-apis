@@ -56,7 +56,6 @@ class OrderControllerTest {
         assertNotNull(result.getBody().toString());
         assertNotNull(result.getBody().getStatus());
         assertNotNull(result.getBody().getCreate_time());
-        assertNotNull(result.getBody().getIdempotentReference());
         assertNotNull(result.getBody().getOrder());
         assertNotNull(result.getBody().getOrder().toString());
         assertNotNull(result.getBody().getOrder().getTotal_amount());
@@ -69,7 +68,7 @@ class OrderControllerTest {
         assertNotNull(result.getBody().getOrder().getProducts().get(0).getAmount().getCurrency());
         assertNotNull(result.getBody().getOrder().getProducts().get(0).getQuantity());
         assertNotNull(result.getBody().getOrder().getProducts().get(0).getName());
-        assertNotNull(result.getBody().getOrder().getProducts().get(0).getId_product());
+        assertNotNull(result.getBody().getOrder().getProducts().get(0).getId());
         assertNotNull(result.getBody().getCustomer().toString());
         assertNotNull(result.getBody().getCustomer().getFirstName());
         assertNotNull(result.getBody().getCustomer().getLastName());
