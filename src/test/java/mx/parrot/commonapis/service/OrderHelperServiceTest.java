@@ -2,6 +2,7 @@ package mx.parrot.commonapis.service;
 
 import mx.parrot.commonapis.dao.OrdersRepository;
 import mx.parrot.commonapis.dao.entity.Orders;
+import mx.parrot.commonapis.exception.ParrotExceptions;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,6 +14,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
+import static mx.parrot.commonapis.exception.ErrorCodes.PARR_REST_ORD_022;
 import static mx.parrot.commonapis.factory.CommonApisFactory.getOrdersDao;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -76,5 +78,34 @@ class OrderHelperServiceTest {
         verify(ordersRepository).delete(any(Orders.class));
 
     }
+
+
+    @Test
+    void when_order_dont_exist_expectedException() {
+
+
+        when(ordersRepository.existsById(anyInt())).thenReturn(Mono.just(false));
+
+        StepVerifier.create(ordersHelperService.existsById(1))
+                .expectErrorMatches(throwable -> throwable instanceof ParrotExceptions &&
+                        ((ParrotExceptions) throwable).getCode().equals(PARR_REST_ORD_022.getCode()))
+                .verify();
+
+    }
+
+    @Test
+    void when_order_exist_expectedOk() {
+
+
+        when(ordersRepository.existsById(anyInt())).thenReturn(Mono.just(true));
+
+        StepVerifier.create(ordersHelperService.existsById(1))
+                .assertNext(orders -> {
+                    assertEquals(Boolean.TRUE, orders);
+                })
+                .verifyComplete();
+
+    }
+
 
 }

@@ -26,8 +26,7 @@ public class CommonApisFactory {
 
         return new OrderRequest()
                 .setCustomer(new Customer()
-                        .setFirstName("Ismael")
-                        .setLastName("Vazquez")
+                        .setFullName("Ivon Lorens")
 
                 )
                 .setOrder(new Order()
@@ -57,10 +56,7 @@ public class CommonApisFactory {
 
         return new OrderResponse()
                 .setCustomer(new Customer()
-                        .setFirstName("Ismael")
-                        .setLastName("Vazquez")
-                        .setMiddleName("Esteban")
-                        .setMaidenName("Flores")
+                        .setFullName("Ivon Lorens")
 
                 )
                 .setOrder(new Order()

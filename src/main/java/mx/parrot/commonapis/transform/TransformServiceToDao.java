@@ -29,29 +29,7 @@ public class TransformServiceToDao {
 
         final String nameCustomer = Optional.ofNullable(orderRequest)
                 .map(OrderRequest::getCustomer)
-                .map(customer -> {
-
-                    String firstName = Optional.of(customer)
-                            .map(Customer::getFirstName)
-                            .orElse(EMPTY);
-
-                    String lastName = Optional.of(customer)
-                            .map(Customer::getLastName)
-                            .orElse(EMPTY);
-
-                    String middleName = Optional.of(customer)
-                            .map(Customer::getMiddleName)
-                            .orElse(EMPTY);
-
-                    String maidenName = Optional.of(customer)
-                            .map(Customer::getMaidenName)
-                            .orElse(EMPTY);
-
-                    String fullName = StringUtils.join(firstName, " ", middleName, " ", lastName, " ", maidenName);
-
-                    return fullName.replace("  ", " ");
-
-                })
+                .map(Customer::getFullName)
                 .orElse(EMPTY);
 
         final BigDecimal totalAmount = Optional.ofNullable(orderRequest)

@@ -19,16 +19,9 @@ public class Customer implements Serializable {
 
     private static final long serialVersionUID = -1808573319388569406L;
 
-    @JsonProperty("first_name")
-    private String firstName;
+    @JsonProperty("full_name")
+    private String fullName;
 
-    @JsonProperty("last_name")
-    private String lastName;
 
-    @JsonProperty("middle_name")
-    private String middleName;
-
-    @JsonProperty("maiden_name")
-    private String maidenName;
 
 }

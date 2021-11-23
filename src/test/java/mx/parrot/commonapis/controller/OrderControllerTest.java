@@ -15,6 +15,7 @@ import reactor.core.publisher.Mono;
 
 import static mx.parrot.commonapis.factory.CommonApisFactory.getOrderRequest;
 import static mx.parrot.commonapis.factory.CommonApisFactory.getOrderResponse;
+import static mx.parrot.commonapis.factory.CommonApisFactory.getParrotRequest;
 import static org.junit.Assert.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
@@ -70,17 +71,15 @@ class OrderControllerTest {
         assertNotNull(result.getBody().getOrder().getProducts().get(0).getName());
         assertNotNull(result.getBody().getOrder().getProducts().get(0).getId());
         assertNotNull(result.getBody().getCustomer().toString());
-        assertNotNull(result.getBody().getCustomer().getFirstName());
-        assertNotNull(result.getBody().getCustomer().getLastName());
-        assertNotNull(result.getBody().getCustomer().getMaidenName());
-        assertNotNull(result.getBody().getCustomer().getMiddleName());
+        assertNotNull(result.getBody().getCustomer().getFullName());
+
 
     }
 
     @Test
     void test_createOrder_happy_pad() {
 
-        when(orderService.createOrder(any()))
+        when(orderService.createOrder(any(), any()))
                 .thenReturn(Mono.just(12345678));
 
         ResponseEntity<?> responseEntity = orderController.createOrder(

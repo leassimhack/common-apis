@@ -5,10 +5,14 @@ import mx.parrot.commonapis.model.OrderResponse;
 import mx.parrot.commonapis.model.ParrotRequest;
 import reactor.core.publisher.Mono;
 
+import java.util.Map;
+
 public interface IOrderService {
+
+    Mono<Integer> createOrder(final Integer userID, Map<String, String> headers);
 
     Mono<OrderResponse> updateOrder(final ParrotRequest<OrderRequest> request);
 
-    Mono<Integer> createOrder(final Integer userID);
+    Mono<OrderResponse> getOrder(final String idOrder);
 
 }

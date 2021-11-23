@@ -11,7 +11,7 @@ public enum ConstantsEnum {
 
     X_PARROT_CLIENT_ID("X-Parrot-Client-Id"),
 
-    USER_ID("User-Id"),
+    X_USER_ID("X-User-Id"),
 
     X_PARROT_DEVICE("X-Parrot-Device"),
 

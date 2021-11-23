@@ -3,26 +3,33 @@ package mx.parrot.commonapis.service;
 import lombok.RequiredArgsConstructor;
 import mx.parrot.commonapis.dao.entity.Orders;
 import mx.parrot.commonapis.dao.entity.Products;
+import mx.parrot.commonapis.exception.ParrotExceptions;
 import mx.parrot.commonapis.model.DtoOrderProducts;
 import mx.parrot.commonapis.model.Order;
 import mx.parrot.commonapis.model.OrderRequest;
 import mx.parrot.commonapis.model.OrderResponse;
 import mx.parrot.commonapis.model.ParrotRequest;
+import mx.parrot.commonapis.transform.TransformServiceToAPi;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.math.BigInteger;
 import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static mx.parrot.commonapis.transform.TransformServiceToAPi.transformToApi;
+import static mx.parrot.commonapis.exception.ErrorCodes.PARR_REST_ORD_023;
 import static mx.parrot.commonapis.transform.TransformServiceToDao.transformOrderToEntity;
 import static mx.parrot.commonapis.util.ConstantsEnum.CREATED;
 import static mx.parrot.commonapis.util.ConstantsEnum.UPDATED;
 import static mx.parrot.commonapis.util.Util.getKey;
+import static mx.parrot.commonapis.validator.OrderValidation.validateCreateOrder;
 import static mx.parrot.commonapis.validator.OrderValidation.validateUpdateOrder;
+import static org.apache.commons.lang3.StringUtils.isNumeric;
 
 @Service
 @RequiredArgsConstructor
@@ -35,40 +42,71 @@ public class OrderService implements IOrderService {
     @Autowired
     private ProductsHelperService productsHelperService;
 
+    @Autowired
+    private UserHelperService userHelperService;
+
     @Override
     public Mono<OrderResponse> updateOrder(final ParrotRequest<OrderRequest> request) {
 
         return validateUpdateOrder(request)
-                .flatMap(aBoolean -> transformOrder(request))
+                .flatMap(validateOk -> userHelperService.existsById(request.getUserId()))
+                .flatMap(existUser -> transformOrder(request))
                 .flatMap(orders -> ordersService.createOrUpdateOrder(orders))
                 .flatMap(orders -> {
-                    final Flux<Products> dtoOrderProducts = productsHelperService.saveProducts(orders.getId(),orders.getStatus(), request);
+                    final Flux<Products> dtoOrderProducts = productsHelperService.saveProducts(orders.getId(), orders.getStatus(), request);
 
                     return Mono.just(new DtoOrderProducts().setProductsFlux(dtoOrderProducts).setOrders(orders));
                 })
-                .flatMap(dtoOrderProducts -> transformToApi(dtoOrderProducts, request));
+                .flatMap(TransformServiceToAPi::transformToApi);
 
 
     }
 
     @Override
-    public Mono<Integer> createOrder(final Integer userID) {
-        AtomicBoolean exist = new AtomicBoolean(true);
-        Integer idOrder = 0;
-        while (exist.get()) {
+    public Mono<OrderResponse> getOrder(String idOrder) {
 
-            exist.set(false);
-            idOrder = getKey(userID);
-
-            ordersService.getOrder(idOrder)
-                    .flatMap(orders -> {
-                        exist.set(true);
-                        return null;
-                    });
-
+        if (!isNumeric(idOrder)) {
+            return Mono.error(new ParrotExceptions(PARR_REST_ORD_023.getCode(), PARR_REST_ORD_023.getMessage(), HttpStatus.BAD_REQUEST));
         }
 
-        return Mono.just(idOrder);
+        final Long id = Long.valueOf(idOrder);
+
+        return ordersService.existsById(id.intValue())
+                .flatMap(exist -> ordersService.getOrder(id.intValue()))
+                .flatMap(orders -> {
+                    Flux<Products> productsFlux = productsHelperService.getProducts(id.intValue());
+                    return Mono.just(new DtoOrderProducts().setProductsFlux(productsFlux).setOrders(orders));
+
+                })
+                .flatMap(TransformServiceToAPi::transformToApi);
+    }
+
+
+    @Override
+    public Mono<Integer> createOrder(final Integer userID, final Map<String, String> headers) {
+
+        return validateCreateOrder(userID, headers)
+                .flatMap(validateOk -> userHelperService.existsById(userID))
+                .flatMap(validateOk -> {
+
+                    AtomicBoolean exist = new AtomicBoolean(true);
+                    Integer idOrder = 0;
+                    while (exist.get()) {
+
+                        exist.set(false);
+                        idOrder = getKey(userID);
+
+                        ordersService.getOrder(idOrder)
+                                .flatMap(orders -> {
+                                    exist.set(true);
+                                    return null;
+                                });
+
+                    }
+
+                    return Mono.just(idOrder);
+                });
+
 
     }
 

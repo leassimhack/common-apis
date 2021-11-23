@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import mx.parrot.commonapis.dao.entity.Orders;
 import mx.parrot.commonapis.model.Amount;
+import mx.parrot.commonapis.model.Customer;
 import mx.parrot.commonapis.model.DtoOrderProducts;
 import mx.parrot.commonapis.model.Order;
 import mx.parrot.commonapis.model.OrderRequest;
@@ -21,7 +22,7 @@ import java.util.List;
 public class TransformServiceToAPi {
 
 
-    public static Mono<OrderResponse> transformToApi(final DtoOrderProducts dtoOrderProducts, ParrotRequest<OrderRequest> request) {
+    public static Mono<OrderResponse> transformToApi(final DtoOrderProducts dtoOrderProducts) {
 
         Mono<List<Product>> listMono = dtoOrderProducts.getProductsFlux()
                 .collectList()
@@ -55,7 +56,7 @@ public class TransformServiceToAPi {
             Orders orders = dtoOrderProducts.getOrders();
 
             orderResponse.setCreate_time(orders.getCreatedTime());
-            orderResponse.setCustomer(request.getBody().getCustomer());
+            orderResponse.setCustomer(new Customer().setFullName(orders.getNameCustomer()));
             orderResponse.setStatus(orders.getStatus());
             orderResponse.setUpdate_time(orders.getUpdateTime());
             orderResponse.setOrder(new Order()

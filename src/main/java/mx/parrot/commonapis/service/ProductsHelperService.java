@@ -51,12 +51,12 @@ public class ProductsHelperService {
                             })
                             .orElse(Mono.just(new Products())))
                     .collectList()
-                    .flatMapMany(products -> this.repository.saveAll(Flux.fromIterable(products)));
+                    .flatMapMany(products -> this.repository.saveAll(products));
 
 
         }
 
-        return this.repository.saveAll(Flux.fromIterable(productsListIterable));
+        return this.repository.saveAll(productsListIterable);
     }
 
 

@@ -46,6 +46,22 @@ public interface IOrderController {
             @PathVariable("order_id") Integer orderId
     );
 
+    @RequestMapping(value = "/order/{order_id}",
+            produces = {"application/json"},
+            consumes = {"application/json"},
+            method = RequestMethod.GET)
+    Mono<ResponseEntity<OrderResponse>> getOrder(
+            @RequestHeader(value = "X-Parrot-Client-Id", required = false) String xParrotClientId,
+            @RequestHeader(value = "Authorization", required = false) String authorization,
+            @RequestHeader(value = "X-B3-TraceId", required = false) String xB3TraceId,
+            @RequestHeader(value = "X-User-Id", required = false) Integer userID,
+            @RequestHeader(value = "X-Parrot-Device", required = false) String xParrotDevice,
+            @PathVariable("order_id") String orderId
+    );
+
+
+
+
 }
 
 

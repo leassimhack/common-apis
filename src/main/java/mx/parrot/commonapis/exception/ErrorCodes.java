@@ -8,13 +8,15 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum ErrorCodes {
 
+    PARR_REST_ORD_000("PARR_REST_ORD_000", "Error, the server encountered an unexpected condition that prevented it from fulfilling the request"),
+
     PARR_REST_ORD_001("PARR_REST_ORD_001", "Error, the header X-Parrot-Client-Id must not be null or empty"),
 
     PARR_REST_ORD_002("PARR_REST_ORD_002", "Error, the header X-Parrot-Device must not be null or empty"),
 
-    PARR_REST_ORD_003("PARR_REST_ORD_003", "Error, the field 'customer.first_name' must not be null"),
+    PARR_REST_ORD_003("PARR_REST_ORD_003", "Error, the field 'customer.full_name' must not be null"),
 
-    PARR_REST_ORD_004("PARR_REST_ORD_004", "Error, the field 'customer.last_name' must not be null"),
+    //PARR_REST_ORD_004("PARR_REST_ORD_004", "Error, the field 'customer.last_name' must not be null"),
 
     PARR_REST_ORD_005("PARR_REST_ORD_005", "Error, the field 'order.total_amount.value' must not be null"),
 
@@ -46,7 +48,13 @@ public enum ErrorCodes {
 
     PARR_REST_US_019("PARR_REST_ORD_019", "Error, the 'email' entered already exists"),
 
-    PARR_REST_ORD_020("PARR_REST_ORD_020", "Error, the header X-User-Id must not be null or empty");
+    PARR_REST_ORD_020("PARR_REST_ORD_020", "Error, the header X-User-Id must not be null or empty"),
+
+    PARR_REST_ORD_021("PARR_REST_ORD_021", "Error, the value header X-User-Id is incorrect"),
+
+    PARR_REST_ORD_022("PARR_REST_ORD_022", "Error, the order id  dont exist"),
+
+    PARR_REST_ORD_023("PARR_REST_ORD_023", " the value of path param '{order_id}' is incorrect");
 
     private String code;
 

@@ -23,7 +23,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static mx.parrot.commonapis.exception.ErrorCodes.PARR_REST_ORD_001;
 import static mx.parrot.commonapis.exception.ErrorCodes.PARR_REST_ORD_002;
 import static mx.parrot.commonapis.exception.ErrorCodes.PARR_REST_ORD_003;
-import static mx.parrot.commonapis.exception.ErrorCodes.PARR_REST_ORD_004;
 import static mx.parrot.commonapis.exception.ErrorCodes.PARR_REST_ORD_005;
 import static mx.parrot.commonapis.exception.ErrorCodes.PARR_REST_ORD_006;
 import static mx.parrot.commonapis.exception.ErrorCodes.PARR_REST_ORD_007;
@@ -47,7 +46,7 @@ public class OrderValidation {
 
     public static Mono<Boolean> validateUpdateOrder(final ParrotRequest<OrderRequest> parrotRequest) {
 
-        if (StringUtils.isBlank(parrotRequest.getUserId().toString())) {
+        if (parrotRequest.getUserId() == null) {
             return Mono.error(new ParrotExceptions(PARR_REST_ORD_020.getCode(), PARR_REST_ORD_020.getMessage(), BAD_REQUEST));
         }
 
@@ -55,6 +54,16 @@ public class OrderValidation {
                 .flatMap(headerOk -> validateBody(parrotRequest.getBody()));
 
     }
+
+    public static Mono<Boolean> validateCreateOrder(final Integer userID, final Map<String, String> headers) {
+
+        if (userID == null) {
+            return Mono.error(new ParrotExceptions(PARR_REST_ORD_020.getCode(), PARR_REST_ORD_020.getMessage(), BAD_REQUEST));
+        }
+        return validateHeaders(headers);
+
+    }
+
 
     private static Mono<Boolean> validateHeaders(final Map<String, String> headers) {
 
@@ -80,15 +89,10 @@ public class OrderValidation {
 
             Optional.of(request)
                     .map(OrderRequest::getCustomer)
-                    .map(Customer::getFirstName)
+                    .map(Customer::getFullName)
                     .filter(s -> !StringUtils.isBlank(s))
                     .orElseThrow(() -> new ParrotExceptions(PARR_REST_ORD_003.getCode(), PARR_REST_ORD_003.getMessage(), BAD_REQUEST));
 
-            Optional.of(request)
-                    .map(OrderRequest::getCustomer)
-                    .map(Customer::getLastName)
-                    .filter(s -> !StringUtils.isBlank(s))
-                    .orElseThrow(() -> new ParrotExceptions(PARR_REST_ORD_004.getCode(), PARR_REST_ORD_004.getMessage(), BAD_REQUEST));
 
             Optional.of(request)
                     .map(OrderRequest::getOrder)

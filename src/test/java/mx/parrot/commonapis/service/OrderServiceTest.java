@@ -24,8 +24,8 @@ import java.util.Map;
 
 import static mx.parrot.commonapis.exception.ErrorCodes.PARR_REST_ORD_001;
 import static mx.parrot.commonapis.exception.ErrorCodes.PARR_REST_ORD_002;
+
 import static mx.parrot.commonapis.exception.ErrorCodes.PARR_REST_ORD_003;
-import static mx.parrot.commonapis.exception.ErrorCodes.PARR_REST_ORD_004;
 import static mx.parrot.commonapis.exception.ErrorCodes.PARR_REST_ORD_005;
 import static mx.parrot.commonapis.exception.ErrorCodes.PARR_REST_ORD_006;
 import static mx.parrot.commonapis.exception.ErrorCodes.PARR_REST_ORD_007;
@@ -34,13 +34,18 @@ import static mx.parrot.commonapis.exception.ErrorCodes.PARR_REST_ORD_009;
 import static mx.parrot.commonapis.exception.ErrorCodes.PARR_REST_ORD_010;
 import static mx.parrot.commonapis.exception.ErrorCodes.PARR_REST_ORD_013;
 import static mx.parrot.commonapis.exception.ErrorCodes.PARR_REST_ORD_014;
+import static mx.parrot.commonapis.exception.ErrorCodes.PARR_REST_ORD_020;
+import static mx.parrot.commonapis.exception.ErrorCodes.PARR_REST_ORD_022;
+import static mx.parrot.commonapis.exception.ErrorCodes.PARR_REST_ORD_023;
 import static mx.parrot.commonapis.factory.CommonApisFactory.getOrdersDao;
 import static mx.parrot.commonapis.factory.CommonApisFactory.getParrotRequest;
 import static mx.parrot.commonapis.factory.CommonApisFactory.getProductsDao;
 import static mx.parrot.commonapis.util.ConstantsEnum.X_PARROT_CLIENT_ID;
 import static mx.parrot.commonapis.util.ConstantsEnum.X_PARROT_DEVICE;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.when;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 @ExtendWith(MockitoExtension.class)
 class OrderServiceTest {
@@ -54,71 +59,103 @@ class OrderServiceTest {
     @Mock
     private ProductsHelperService productsHelperService;
 
+    @Mock
+    private UserHelperService userHelperService;
+
     @BeforeEach
     void setUp() {
         MockitoAnnotations.initMocks(this);
+
     }
 
     @Test
     void createOrder_when_id_order_dont_exist_expectedIdOrder() {
 
         when(ordersHelperService.getOrder(any())).thenReturn(Mono.empty());
+        when(userHelperService.existsById(anyInt())).thenReturn(Mono.just(true));
 
-        StepVerifier.create(orderService.createOrder(1))
+        StepVerifier.create(orderService.createOrder(1, getParrotRequest().getHeaders()))
                 .assertNext(Assertions::assertNotNull
                 ).verifyComplete();
 
     }
 
     @Test
-    void updateOrder_when_id_order_dont_exist_createToNew() {
+    void getOrder_when_id_order_exist_expectedIdOrder() {
 
-        when(ordersHelperService.getOrder(any())).thenReturn(Mono.empty());
-        when(ordersHelperService.createOrUpdateOrder(any())).thenReturn(Mono.just(getOrdersDao()));
-
-        when(productsHelperService.saveProducts(any(), any(), any())).thenReturn(Flux.just(getProductsDao()));
-
-
-        StepVerifier.create(orderService.updateOrder(getParrotRequest()))
-                .assertNext(Assertions::assertNotNull).verifyComplete();
-
-    }
-
-    @Test
-    void updateOrder_when_id_order_exist_onlyUpdate() {
-
+        when(ordersHelperService.existsById(any())).thenReturn(Mono.just(true));
         when(ordersHelperService.getOrder(any())).thenReturn(Mono.just(getOrdersDao()));
-        when(ordersHelperService.createOrUpdateOrder(any())).thenReturn(Mono.just(getOrdersDao()));
-        when(productsHelperService.saveProducts(any(), any(), any())).thenReturn(Flux.just(getProductsDao()));
+        when(productsHelperService.getProducts(any())).thenReturn(Flux.just(getProductsDao()));
 
-        StepVerifier.create(orderService.updateOrder(getParrotRequest()))
-                .assertNext(Assertions::assertNotNull).verifyComplete();
-
+        StepVerifier.create(orderService.getOrder("1"))
+                .assertNext(Assertions::assertNotNull
+                ).verifyComplete();
 
     }
 
     @Test
-    void createUser_when_customer_firsName_is_null_expectedException() {
+    void getOrder_when_id_order_dont_exist_expectedIdOrder() {
 
-        final Customer customer = getParrotRequest().getBody().getCustomer().setFirstName("");
-        final OrderRequest req = getParrotRequest().getBody().setCustomer(customer);
+        when(ordersHelperService.existsById(any())).thenReturn(Mono.error(new ParrotExceptions(PARR_REST_ORD_022.getCode(), PARR_REST_ORD_022.getMessage(), NOT_FOUND)));
 
-        StepVerifier.create(orderService.updateOrder(getParrotRequest().setBody(req)))
+
+        StepVerifier.create(orderService.getOrder("1"))
                 .expectErrorMatches(throwable -> throwable instanceof ParrotExceptions &&
-                        ((ParrotExceptions) throwable).getCode().equals(PARR_REST_ORD_003.getCode()))
+                        ((ParrotExceptions) throwable).getCode().equals(PARR_REST_ORD_022.getCode()))
                 .verify();
 
     }
 
     @Test
-    void createUser_when_customer_lastName_is_null_expectedException() {
+    void getOrder_when_id_order_is_not_numeric_expectedIdOrder() {
 
-        final Customer customer = getParrotRequest().getBody().getCustomer().setLastName("");
+
+        StepVerifier.create(orderService.getOrder("fgfdgdf"))
+                .expectErrorMatches(throwable -> throwable instanceof ParrotExceptions &&
+                        ((ParrotExceptions) throwable).getCode().equals(PARR_REST_ORD_023.getCode()))
+                .verify();
+
+    }
+
+
+
+    @Test
+    void updateOrder_when_id_order_dont_exist_createToNew() {
+
+        when(ordersHelperService.getOrder(any())).thenReturn(Mono.empty());
+        when(ordersHelperService.createOrUpdateOrder(any())).thenReturn(Mono.just(getOrdersDao()));
+        when(productsHelperService.saveProducts(any(), any(), any())).thenReturn(Flux.just(getProductsDao()));
+        when(userHelperService.existsById(anyInt())).thenReturn(Mono.just(true));
+
+        StepVerifier.create(orderService.updateOrder(getParrotRequest()))
+                .assertNext(Assertions::assertNotNull).verifyComplete();
+
+    }
+
+    @Test
+    void updateOrder_when_id_order_exist_onlyUpdate_expectedOK() {
+
+        when(userHelperService.existsById(any())).thenReturn(Mono.just(true));
+        when(ordersHelperService.getOrder(any())).thenReturn(Mono.just(getOrdersDao()));
+        when(ordersHelperService.createOrUpdateOrder(any())).thenReturn(Mono.just(getOrdersDao()));
+        when(productsHelperService.saveProducts(any(), any(), any())).thenReturn(Flux.just(getProductsDao()));
+
+
+        StepVerifier.create(orderService.updateOrder(getParrotRequest()))
+                .assertNext(Assertions::assertNotNull).verifyComplete();
+
+
+    }
+
+    @Test
+    void createUser_when_customer_full_name_is_null_expectedException() {
+
+        final Customer customer = getParrotRequest().getBody().getCustomer().setFullName("");
         final OrderRequest req = getParrotRequest().getBody().setCustomer(customer);
 
         StepVerifier.create(orderService.updateOrder(getParrotRequest().setBody(req)))
                 .expectErrorMatches(throwable -> throwable instanceof ParrotExceptions &&
-                        ((ParrotExceptions) throwable).getCode().equals(PARR_REST_ORD_004.getCode()))
+                        ((ParrotExceptions) throwable).getCode().equals(PARR_REST_ORD_003.getCode()))
                 .verify();
 
     }
@@ -270,6 +307,17 @@ class OrderServiceTest {
         StepVerifier.create(orderService.updateOrder(getParrotRequest().setHeaders(headers)))
                 .expectErrorMatches(throwable -> throwable instanceof ParrotExceptions &&
                         ((ParrotExceptions) throwable).getCode().equals(PARR_REST_ORD_002.getCode()))
+                .verify();
+
+    }
+
+    @Test
+    void createUser_when_header_x_user_id_null_expectedException() {
+
+
+        StepVerifier.create(orderService.updateOrder(getParrotRequest().setUserId(null)))
+                .expectErrorMatches(throwable -> throwable instanceof ParrotExceptions &&
+                        ((ParrotExceptions) throwable).getCode().equals(PARR_REST_ORD_020.getCode()))
                 .verify();
 
     }
