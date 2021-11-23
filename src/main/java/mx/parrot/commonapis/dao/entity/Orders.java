@@ -2,6 +2,8 @@ package mx.parrot.commonapis.dao.entity;
 
 
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import mx.parrot.commonapis.transform.LocalDateTimePersistenceConverter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.domain.Persistable;
@@ -14,6 +16,8 @@ import java.time.LocalDateTime;
 
 @Data
 @Table("orders")
+@Getter
+@Setter
 public class Orders implements Persistable<Integer> {
 
     @Id

@@ -2,6 +2,8 @@ package mx.parrot.commonapis.dao.entity;
 
 
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import mx.parrot.commonapis.transform.LocalDateTimePersistenceConverter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
@@ -15,6 +17,8 @@ import java.time.LocalDateTime;
 
 @Data
 @Table("users")
+@Getter
+@Setter
 public class User implements Serializable {
 
     private static final long serialVersionUID = -3319997576677814092L;

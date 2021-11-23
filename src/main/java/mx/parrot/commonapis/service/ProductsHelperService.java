@@ -31,6 +31,12 @@ public class ProductsHelperService {
                 .doOnNext(p -> log.info("user with id " + p.getId()));
     }
 
+    public Flux<Products> getProducts(final String fromDate, final String toDate) {
+        return this.repository.findAllByCreatedTimeBetween(fromDate, toDate)
+                .doOnNext(p -> log.info("user with id " + p.getId()));
+    }
+
+
     public Flux<Products> saveProducts(final Integer idOrder, String status, final ParrotRequest<OrderRequest> request) {
 
         List<Products> productsListIterable = createIterableProducts(idOrder, status, request);
@@ -44,6 +50,7 @@ public class ProductsHelperService {
                             .map(products -> {
 
                                 products.setId(product.getId());
+                                products.setUpdateTime(LocalDateTime.now());
 
                                 return Mono.just(products);
 
