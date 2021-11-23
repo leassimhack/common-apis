@@ -1,6 +1,7 @@
 package mx.parrot.commonapis.factory;
 
 import mx.parrot.commonapis.dao.entity.Orders;
+import mx.parrot.commonapis.dao.entity.Products;
 import mx.parrot.commonapis.model.Amount;
 import mx.parrot.commonapis.model.Customer;
 import mx.parrot.commonapis.model.Order;
@@ -9,11 +10,15 @@ import mx.parrot.commonapis.model.OrderResponse;
 import mx.parrot.commonapis.model.ParrotRequest;
 import mx.parrot.commonapis.model.Product;
 import mx.parrot.commonapis.model.User;
+import reactor.core.publisher.Mono;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static mx.parrot.commonapis.util.ConstantsEnum.X_PARROT_CLIENT_ID;
@@ -137,6 +142,21 @@ public class CommonApisFactory {
         return products;
     }
 
+
+    public static List<Product> getProductsApi() {
+
+
+        final mx.parrot.commonapis.model.Product products = new mx.parrot.commonapis.model.Product();
+        products.setId(1);
+        products.setName("Coffe");
+        products.setQuantity(2);
+
+        products.setAmount(new Amount().setCurrency("MXN").setValue(BigDecimal.valueOf(1)));
+
+
+        return Collections.singletonList(products);
+    }
+
     public static Orders getOrdersDao() {
         Orders orders = new Orders();
 
@@ -149,6 +169,16 @@ public class CommonApisFactory {
         orders.setIdUser(1);
 
         return orders;
+
+    }
+
+    public static Mono<List<Products>> getProductsList() {
+        List<Products> productsList = new ArrayList<>();
+
+        productsList.add(getProductsDao());
+        productsList.add(getProductsDao());
+
+        return Mono.just(productsList);
 
     }
 

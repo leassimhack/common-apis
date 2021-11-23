@@ -19,6 +19,7 @@ import static mx.parrot.commonapis.factory.CommonApisFactory.getParrotRequest;
 import static org.junit.Assert.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 
@@ -92,6 +93,26 @@ class OrderControllerTest {
         ).block();
 
         assertEquals("http://localhost:8086/api/v1/order/12345678", responseEntity.getHeaders().getLocation().toString());
+
+    }
+
+    @Test
+    void getOrder_happy_pad() {
+
+        when(orderService.getOrder(anyString()))
+                .thenReturn(Mono.just(getOrderResponse()));
+
+        ResponseEntity<?> responseEntity = orderController.getOrder(
+                "2321312",
+                "55435353",
+                "32432432",
+                1,
+                "web",
+                "1"
+        ).block();
+
+        assertNotNull(responseEntity.getBody());
+
 
     }
 
