@@ -1,0 +1,506 @@
+{
+	"info": {
+		"_postman_id": "36c50bec-49ab-4214-9d9a-066fa2fcf2db",
+		"name": "Parrot_apis",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "1-Tokens",
+			"item": []
+		},
+		{
+			"name": "9. EndPoint",
+			"item": [
+				{
+					"name": "/api/v1/user",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNjE0MmE4MmM4MzU3MjI2OTAyMzhjNjc5IiwiZW1haWwiOiJsb3JlbnpvdmF6cXVleml2ZXR0ZTIzQGdtYWlsLmNvbSIsImlhdCI6MTYzNDA2NDQzOSwiZXhwIjoxNjM0MDcxNjM5fQ.c5kszCcqi8jXEjcPxPp0VSYGrc3rtObvdsEsj34OtKQ",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\":\"missael\",\r\n    \"email\": \"missael3@gmail.com\"\r\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8086/api/v1/user",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8086",
+							"path": [
+								"api",
+								"v1",
+								"user"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/api/v1/order",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "",
+								"disabled": true
+							},
+							{
+								"key": "X-Parrot-Client-Id",
+								"type": "text",
+								"value": "12329-8998"
+							},
+							{
+								"key": "X-B3-TraceId",
+								"type": "text",
+								"value": "fdfsf343243fdsfsd3-234312312-123",
+								"disabled": true
+							},
+							{
+								"key": "X-User-Id",
+								"type": "text",
+								"value": "1"
+							},
+							{
+								"key": "X-Parrot-Device",
+								"type": "text",
+								"value": "web"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "http://localhost:8086/api/v1/order",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8086",
+							"path": [
+								"api",
+								"v1",
+								"order"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/api/v1/order/{order_id}",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "",
+								"type": "text"
+							},
+							{
+								"key": "X-Parrot-Client-Id",
+								"value": "12329-8998",
+								"type": "text"
+							},
+							{
+								"key": "X-B3-TraceId",
+								"value": "fdfsf343243fdsfsd3-234312312-123",
+								"type": "text"
+							},
+							{
+								"key": "X-User-Id",
+								"value": "1",
+								"type": "text"
+							},
+							{
+								"key": "X-Parrot-Device",
+								"value": "web",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"customer\": {\r\n        \"full_name\": \"Ivone Aime Lorens\"\r\n    },\r\n    \"order\": {\r\n    \r\n        \"products\": [\r\n            {\r\n                \"id_product\": 122,\r\n                \"name\": \"Baggett\",\r\n                \"quantity\":2,\r\n                \"amount\": {\r\n                    \"value\": 1,\r\n                    \"currency\": \"MXN\"\r\n                }\r\n            }\r\n        ]\r\n    }\r\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8086/api/v1/order/1347445810",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8086",
+							"path": [
+								"api",
+								"v1",
+								"order",
+								"1347445810"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/api/v1/order/{order_id}",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "",
+								"type": "text"
+							},
+							{
+								"key": "X-Parrot-Client-Id",
+								"value": "12329-8998",
+								"type": "text"
+							},
+							{
+								"key": "X-B3-TraceId",
+								"value": "fdfsf343243fdsfsd3-234312312-123",
+								"type": "text"
+							},
+							{
+								"key": "X-User-Id",
+								"value": "1",
+								"type": "text"
+							},
+							{
+								"key": "X-Parrot-Device",
+								"value": "web",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8086/api/v1/order/1347445810",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8086",
+							"path": [
+								"api",
+								"v1",
+								"order",
+								"1347445810"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/api/v1/order/{order_id}",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": ""
+							},
+							{
+								"key": "X-Parrot-Client-Id",
+								"type": "text",
+								"value": "12329-8998"
+							},
+							{
+								"key": "X-B3-TraceId",
+								"type": "text",
+								"value": "fdfsf343243fdsfsd3-234312312-123"
+							},
+							{
+								"key": "X-User-Id",
+								"type": "text",
+								"value": "1"
+							},
+							{
+								"key": "X-Parrot-Device",
+								"type": "text",
+								"value": "web"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8086/api/v1/order/1333153676",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8086",
+							"path": [
+								"api",
+								"v1",
+								"order",
+								"1333153676"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/api/v1/products/report",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/pdf",
+								"disabled": true
+							},
+							{
+								"key": "Authorization",
+								"value": "",
+								"type": "text"
+							},
+							{
+								"key": "X-Parrot-Client-Id",
+								"value": "12329-8998",
+								"type": "text"
+							},
+							{
+								"key": "X-B3-TraceId",
+								"value": "fdfsf343243fdsfsd3-234312312-123",
+								"type": "text"
+							},
+							{
+								"key": "X-User-Id",
+								"value": "1",
+								"type": "text"
+							},
+							{
+								"key": "X-Parrot-Device",
+								"value": "web",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8086/api/v1/products/report?from_date=2021-11-23&to_date=2021-11-23",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8086",
+							"path": [
+								"api",
+								"v1",
+								"products",
+								"report"
+							],
+							"query": [
+								{
+									"key": "from_date",
+									"value": "2021-11-23"
+								},
+								{
+									"key": "to_date",
+									"value": "2021-11-23"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/api/v1/order/{order_id}/product",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": ""
+							},
+							{
+								"key": "X-Parrot-Client-Id",
+								"type": "text",
+								"value": "12329-8998"
+							},
+							{
+								"key": "X-B3-TraceId",
+								"type": "text",
+								"value": "fdfsf343243fdsfsd3-234312312-123"
+							},
+							{
+								"key": "X-User-Id",
+								"type": "text",
+								"value": "1"
+							},
+							{
+								"key": "X-Parrot-Device",
+								"type": "text",
+								"value": "web"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"Baggett\",\r\n    \"quantity\": 1,\r\n    \"amount\": {\r\n        \"value\": 100.9,\r\n        \"currency\": \"MXN\"\r\n    }\r\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8086/api/v1/order/1347445810/product",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8086",
+							"path": [
+								"api",
+								"v1",
+								"order",
+								"1347445810",
+								"product"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/api/v1/order/{order_id}/product/{product_id}",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": ""
+							},
+							{
+								"key": "X-Parrot-Client-Id",
+								"type": "text",
+								"value": "12329-8998"
+							},
+							{
+								"key": "X-B3-TraceId",
+								"type": "text",
+								"value": "fdfsf343243fdsfsd3-234312312-123"
+							},
+							{
+								"key": "X-User-Id",
+								"type": "text",
+								"value": "1"
+							},
+							{
+								"key": "X-Parrot-Device",
+								"type": "text",
+								"value": "web"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"amount\": {\r\n        \"value\": 70,\r\n        \"currency\": \"USD\"\r\n    }\r\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8086/api/v1/order/1347445810/product/132",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8086",
+							"path": [
+								"api",
+								"v1",
+								"order",
+								"1347445810",
+								"product",
+								"132"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/api/v1/order/{order_id}/product/{product_id}",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "",
+								"type": "text"
+							},
+							{
+								"key": "X-Parrot-Client-Id",
+								"value": "12329-8998",
+								"type": "text"
+							},
+							{
+								"key": "X-B3-TraceId",
+								"value": "fdfsf343243fdsfsd3-234312312-123",
+								"type": "text"
+							},
+							{
+								"key": "X-User-Id",
+								"value": "1",
+								"type": "text"
+							},
+							{
+								"key": "X-Parrot-Device",
+								"value": "web",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8086/api/v1/order/1347445810/product/131",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8086",
+							"path": [
+								"api",
+								"v1",
+								"order",
+								"1347445810",
+								"product",
+								"131"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
