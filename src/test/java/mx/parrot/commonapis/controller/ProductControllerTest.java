@@ -1,8 +1,5 @@
 package mx.parrot.commonapis.controller;
 
-import mx.parrot.commonapis.model.OrderResponse;
-import mx.parrot.commonapis.model.User;
-import mx.parrot.commonapis.service.OrderService;
 import mx.parrot.commonapis.service.ProductService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,18 +10,11 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.util.UriComponentsBuilder;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import static mx.parrot.commonapis.factory.CommonApisFactory.getOrderRequest;
-import static mx.parrot.commonapis.factory.CommonApisFactory.getOrderResponse;
 import static mx.parrot.commonapis.factory.CommonApisFactory.getProductsApi;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 
@@ -46,10 +36,10 @@ class ProductControllerTest {
     @Test
     void test_updateOrder_happy_pad() {
 
-        when(productService.getProductReport(any(),any(),any())).thenReturn(Mono.just(getProductsApi()));
+        when(productService.getProductReport(any(), any(), any())).thenReturn(Mono.just(getProductsApi()));
 
 
-        ResponseEntity<InputStreamResource> result = productController.createOrder(
+        ResponseEntity<InputStreamResource> result = productController.createReport(
                 "2321312",
                 "55435353",
                 "32432432",
@@ -59,7 +49,7 @@ class ProductControllerTest {
                 "1"
         ).block();
 
-        assertTrue (result.getStatusCode().is2xxSuccessful());
+        assertTrue(result.getStatusCode().is2xxSuccessful());
 
     }
 

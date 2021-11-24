@@ -15,4 +15,6 @@ public interface IOrderService {
 
     Mono<OrderResponse> getOrder(final String idOrder);
 
+    Mono<Void> deleteOrder(final String idOrder);
+
 }

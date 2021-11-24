@@ -3,6 +3,7 @@ package mx.parrot.commonapis.validator;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import mx.parrot.commonapis.exception.ErrorCodes;
 import mx.parrot.commonapis.exception.ParrotExceptions;
 import mx.parrot.commonapis.model.Amount;
 import mx.parrot.commonapis.model.Customer;
@@ -15,6 +16,7 @@ import org.apache.commons.lang3.StringUtils;
 import reactor.core.publisher.Mono;
 
 import java.math.BigDecimal;
+import java.util.Currency;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -23,20 +25,28 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static mx.parrot.commonapis.exception.ErrorCodes.PARR_REST_ORD_001;
 import static mx.parrot.commonapis.exception.ErrorCodes.PARR_REST_ORD_002;
 import static mx.parrot.commonapis.exception.ErrorCodes.PARR_REST_ORD_003;
-import static mx.parrot.commonapis.exception.ErrorCodes.PARR_REST_ORD_005;
-import static mx.parrot.commonapis.exception.ErrorCodes.PARR_REST_ORD_006;
 import static mx.parrot.commonapis.exception.ErrorCodes.PARR_REST_ORD_007;
 import static mx.parrot.commonapis.exception.ErrorCodes.PARR_REST_ORD_008;
 import static mx.parrot.commonapis.exception.ErrorCodes.PARR_REST_ORD_009;
 import static mx.parrot.commonapis.exception.ErrorCodes.PARR_REST_ORD_010;
 import static mx.parrot.commonapis.exception.ErrorCodes.PARR_REST_ORD_011;
-import static mx.parrot.commonapis.exception.ErrorCodes.PARR_REST_ORD_013;
 import static mx.parrot.commonapis.exception.ErrorCodes.PARR_REST_ORD_014;
 import static mx.parrot.commonapis.exception.ErrorCodes.PARR_REST_ORD_016;
 import static mx.parrot.commonapis.exception.ErrorCodes.PARR_REST_ORD_020;
+import static mx.parrot.commonapis.exception.ErrorCodes.PARR_REST_ORD_025;
+import static mx.parrot.commonapis.exception.ErrorCodes.PARR_REST_ORD_026;
+import static mx.parrot.commonapis.exception.ErrorCodes.PARR_REST_ORD_027;
+import static mx.parrot.commonapis.exception.ErrorCodes.PARR_REST_ORD_028;
+import static mx.parrot.commonapis.exception.ErrorCodes.PARR_REST_ORD_029;
+import static mx.parrot.commonapis.exception.ErrorCodes.PARR_REST_ORD_030;
+import static mx.parrot.commonapis.exception.ErrorCodes.PARR_REST_ORD_032;
+import static mx.parrot.commonapis.exception.ErrorCodes.PARR_REST_ORD_033;
+import static mx.parrot.commonapis.util.ConstantsEnum.CURRENCY_XTS;
+import static mx.parrot.commonapis.util.ConstantsEnum.CURRENCY_XXX;
 import static mx.parrot.commonapis.util.ConstantsEnum.X_PARROT_CLIENT_ID;
 import static mx.parrot.commonapis.util.ConstantsEnum.X_PARROT_DEVICE;
 import static mx.parrot.commonapis.util.Util.replaceMessage;
+import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 
 
@@ -94,33 +104,6 @@ public class OrderValidation {
                     .orElseThrow(() -> new ParrotExceptions(PARR_REST_ORD_003.getCode(), PARR_REST_ORD_003.getMessage(), BAD_REQUEST));
 
 
-            Optional.of(request)
-                    .map(OrderRequest::getOrder)
-                    .map(Order::getTotal_amount)
-                    .map(Amount::getValue)
-                    .filter(s -> !StringUtils.isBlank(s.toString()))
-                    .orElseThrow(() -> new ParrotExceptions(PARR_REST_ORD_005.getCode(), PARR_REST_ORD_005.getMessage(), BAD_REQUEST));
-
-            Optional.of(request)
-                    .map(OrderRequest::getOrder)
-                    .map(Order::getTotal_amount)
-                    .map(Amount::getValue)
-                    .map(value -> {
-                        BigDecimal valueCompare = new BigDecimal("0.0");
-                        if (value.compareTo(valueCompare) <= 0.0) {
-                            throw new ParrotExceptions(PARR_REST_ORD_013.getCode(), PARR_REST_ORD_013.getMessage(), BAD_REQUEST);
-                        }
-                        return true;
-                    });
-
-            Optional.of(request)
-                    .map(OrderRequest::getOrder)
-                    .map(Order::getTotal_amount)
-                    .map(Amount::getCurrency)
-                    .filter(s -> !StringUtils.isBlank(s))
-                    .orElseThrow(() -> new ParrotExceptions(PARR_REST_ORD_006.getCode(), PARR_REST_ORD_006.getMessage(), BAD_REQUEST));
-
-
         } catch (ParrotExceptions ex) {
             return Mono.error(ex);
         }
@@ -159,7 +142,7 @@ public class OrderValidation {
 
                 Optional.of(product)
                         .map(Product::getQuantity)
-                        .filter(quantity -> 0 != quantity)
+                        .filter(quantity -> quantity > 0)
                         .orElseThrow(() -> new ParrotExceptions(PARR_REST_ORD_016.getCode(), replaceMessage(PARR_REST_ORD_016.getMessage(), i), BAD_REQUEST));
 
                 Optional.of(product)
@@ -179,11 +162,16 @@ public class OrderValidation {
                             return true;
                         });
 
-                Optional.of(product)
+                String currency = Optional.of(product)
                         .map(Product::getAmount)
                         .map(Amount::getCurrency)
-                        .filter(s -> !StringUtils.isBlank(s))
-                        .orElseThrow(() -> new ParrotExceptions(PARR_REST_ORD_010.getCode(), PARR_REST_ORD_010.getMessage(), BAD_REQUEST));
+                        .orElse(EMPTY);
+
+                if (StringUtils.isBlank(currency)) {
+                    throw new ParrotExceptions(PARR_REST_ORD_010.getCode(), PARR_REST_ORD_010.getMessage(), BAD_REQUEST);
+                }
+
+                validateCurrency(currency, PARR_REST_ORD_033);
 
             });
 
@@ -194,6 +182,126 @@ public class OrderValidation {
 
         return Mono.just(true);
 
+    }
+
+
+    public static Mono<Boolean> validateProduct(Product product) {
+
+        try {
+            Optional.of(product)
+                    .map(Product::getName)
+                    .filter(name -> !StringUtils.isBlank(name))
+                    .orElseThrow(() -> new ParrotExceptions(PARR_REST_ORD_025.getCode(), PARR_REST_ORD_025.getMessage(), BAD_REQUEST));
+
+            Optional.of(product)
+                    .map(Product::getQuantity)
+                    .filter(quantity -> !StringUtils.isBlank(quantity.toString()))
+                    .orElseThrow(() -> new ParrotExceptions(PARR_REST_ORD_026.getCode(), PARR_REST_ORD_026.getMessage(), BAD_REQUEST));
+
+            Optional.of(product)
+                    .map(Product::getQuantity)
+                    .filter(quantity -> quantity > 0)
+                    .orElseThrow(() -> new ParrotExceptions(PARR_REST_ORD_027.getCode(), PARR_REST_ORD_027.getMessage(), BAD_REQUEST));
+
+            Optional.of(product)
+                    .map(Product::getAmount)
+                    .map(Amount::getValue)
+                    .filter(s -> !StringUtils.isBlank(s.toString()))
+                    .orElseThrow(() -> new ParrotExceptions(PARR_REST_ORD_028.getCode(), PARR_REST_ORD_028.getMessage(), BAD_REQUEST));
+
+
+            Optional.of(product)
+                    .map(Product::getAmount)
+                    .map(Amount::getValue)
+                    .map(value -> {
+                        BigDecimal valueCompare = new BigDecimal("0.0");
+                        if (value.compareTo(valueCompare) <= 0.0) {
+                            throw new ParrotExceptions(PARR_REST_ORD_029.getCode(), PARR_REST_ORD_029.getMessage(), BAD_REQUEST);
+                        }
+                        return true;
+                    });
+
+
+            String currency = Optional.of(product)
+                    .map(Product::getAmount)
+                    .map(Amount::getCurrency)
+                    .orElse(EMPTY);
+
+            if (StringUtils.isBlank(currency)) {
+                throw new ParrotExceptions(PARR_REST_ORD_030.getCode(), PARR_REST_ORD_030.getMessage(), BAD_REQUEST);
+            }
+
+            validateCurrency(currency, PARR_REST_ORD_032);
+
+
+        } catch (ParrotExceptions ex) {
+            return Mono.error(ex);
+        }
+
+        return Mono.just(true);
+
+    }
+
+    public static Mono<Boolean> validateUpdateProduct(Product product) {
+
+        try {
+
+            final Integer quantity =Optional.of(product)
+                    .map(Product::getQuantity)
+                    .orElse(null);
+
+            if(quantity!= null){
+
+                if(quantity < 1){
+                    throw new ParrotExceptions(PARR_REST_ORD_027.getCode(), PARR_REST_ORD_027.getMessage(), BAD_REQUEST);
+                }
+
+            }
+
+            Optional.of(product)
+                    .map(Product::getAmount)
+                    .map(Amount::getValue)
+                    .map(value -> {
+                        BigDecimal valueCompare = new BigDecimal("0.0");
+                        if (value.compareTo(valueCompare) <= 0.0) {
+                            throw new ParrotExceptions(PARR_REST_ORD_029.getCode(), PARR_REST_ORD_029.getMessage(), BAD_REQUEST);
+                        }
+                        return true;
+                    });
+
+
+            String currency = Optional.of(product)
+                    .map(Product::getAmount)
+                    .map(Amount::getCurrency)
+                    .orElse(EMPTY);
+
+            if (!StringUtils.isBlank(currency)) {
+                validateCurrency(currency, PARR_REST_ORD_032);
+            }
+
+
+
+
+        } catch (ParrotExceptions ex) {
+            return Mono.error(ex);
+        }
+
+        return Mono.just(true);
+
+    }
+
+    private static void validateCurrency(final String currency, ErrorCodes errorCodes) {
+
+        try {
+            Currency current = Currency.getInstance(currency);
+            if (CURRENCY_XXX.getValue().equalsIgnoreCase(current.getCurrencyCode()) ||
+                    CURRENCY_XTS.getValue().equalsIgnoreCase(current.getCurrencyCode())) {
+                throw new IllegalArgumentException();
+            }
+        } catch (IllegalArgumentException exception) {
+            log.error("No existe el codigo de la moneda", exception);
+            throw new ParrotExceptions(errorCodes.getCode(), errorCodes.getMessage(), BAD_REQUEST);
+        }
     }
 
 }

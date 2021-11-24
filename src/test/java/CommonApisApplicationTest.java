@@ -9,12 +9,12 @@ import org.springframework.test.context.junit4.SpringRunner;
 @SpringBootTest(classes = CommonApisApplication.class)
 public class CommonApisApplicationTest {
 
-	public static void main(String[] args) {
-		SpringApplication.run(CommonApisApplicationTest.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(CommonApisApplicationTest.class, args);
+    }
 
-	@Test
-	public void contextLoads() {
-	}
+    @Test
+    public void contextLoads() {
+    }
 
 }

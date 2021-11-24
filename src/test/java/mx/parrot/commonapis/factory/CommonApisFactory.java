@@ -4,12 +4,14 @@ import mx.parrot.commonapis.dao.entity.Orders;
 import mx.parrot.commonapis.dao.entity.Products;
 import mx.parrot.commonapis.model.Amount;
 import mx.parrot.commonapis.model.Customer;
+import mx.parrot.commonapis.model.DtoOrderProducts;
 import mx.parrot.commonapis.model.Order;
 import mx.parrot.commonapis.model.OrderRequest;
 import mx.parrot.commonapis.model.OrderResponse;
 import mx.parrot.commonapis.model.ParrotRequest;
 import mx.parrot.commonapis.model.Product;
 import mx.parrot.commonapis.model.User;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.math.BigDecimal;
@@ -37,19 +39,19 @@ public class CommonApisFactory {
                 .setOrder(new Order()
                         .setTotal_amount(new Amount()
                                 .setValue(BigDecimal.valueOf(10.0))
-                                .setCurrency("MXP")
+                                .setCurrency("MXN")
                         )
                         .setProducts(Arrays.asList(
                                 new Product()
                                         .setAmount(new Amount()
                                                 .setValue(BigDecimal.valueOf(1))
-                                                .setCurrency("MXP"))
+                                                .setCurrency("MXN"))
                                         .setName("Coffe")
                                         .setQuantity(1),
                                 new Product()
                                         .setAmount(new Amount()
                                                 .setValue(BigDecimal.valueOf(1))
-                                                .setCurrency("MXP"))
+                                                .setCurrency("MXN"))
                                         .setName("Coffe")
                                         .setQuantity(2)
                         )));
@@ -68,21 +70,21 @@ public class CommonApisFactory {
                         .setId(1)
                         .setTotal_amount(new Amount()
                                 .setValue(BigDecimal.valueOf(10.0))
-                                .setCurrency("MXP")
+                                .setCurrency("MXN")
                         )
                         .setProducts(Arrays.asList(
                                 new Product()
                                         .setId(1)
                                         .setAmount(new Amount()
                                                 .setValue(BigDecimal.valueOf(1))
-                                                .setCurrency("MXP"))
+                                                .setCurrency("MXN"))
                                         .setName("Coffe")
                                         .setQuantity(1),
                                 new Product()
                                         .setId(1)
                                         .setAmount(new Amount()
                                                 .setValue(BigDecimal.valueOf(1))
-                                                .setCurrency("MXP"))
+                                                .setCurrency("MXN"))
                                         .setName("Coffe")
                                         .setQuantity(2)
                         ))
@@ -180,6 +182,24 @@ public class CommonApisFactory {
 
         return Mono.just(productsList);
 
+    }
+
+    public static DtoOrderProducts getDtoOrderProducts() {
+        DtoOrderProducts dtoOrderProducts = new DtoOrderProducts();
+        dtoOrderProducts.setOrders(getOrdersDao());
+        dtoOrderProducts.setProductsFlux(Flux.fromIterable(Collections.singletonList(getProductsDao())));
+
+        return dtoOrderProducts;
+    }
+
+    public static Product getProduct() {
+
+        return new Product()
+                .setAmount(new Amount().setCurrency("MXN").setValue(BigDecimal.valueOf(1.0)))
+                .setQuantity(1)
+                .setName("Coffe")
+                .setStatus("CREATED")
+                .setCreate_time(LocalDateTime.now());
     }
 
 

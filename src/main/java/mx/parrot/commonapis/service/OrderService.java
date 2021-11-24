@@ -10,19 +10,20 @@ import mx.parrot.commonapis.model.OrderRequest;
 import mx.parrot.commonapis.model.OrderResponse;
 import mx.parrot.commonapis.model.ParrotRequest;
 import mx.parrot.commonapis.transform.TransformServiceToAPi;
+import org.reactivestreams.Subscriber;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static mx.parrot.commonapis.exception.ErrorCodes.PARR_REST_ORD_023;
+import static mx.parrot.commonapis.transform.TransformServiceToAPi.transformToApi;
 import static mx.parrot.commonapis.transform.TransformServiceToDao.transformOrderToEntity;
 import static mx.parrot.commonapis.util.ConstantsEnum.CREATED;
 import static mx.parrot.commonapis.util.ConstantsEnum.UPDATED;
@@ -45,6 +46,9 @@ public class OrderService implements IOrderService {
     @Autowired
     private UserHelperService userHelperService;
 
+    @Autowired
+    private OrderProductService orderProductService;
+
     @Override
     public Mono<OrderResponse> updateOrder(final ParrotRequest<OrderRequest> request) {
 
@@ -52,13 +56,12 @@ public class OrderService implements IOrderService {
                 .flatMap(validateOk -> userHelperService.existsById(request.getUserId()))
                 .flatMap(existUser -> transformOrder(request))
                 .flatMap(orders -> ordersService.createOrUpdateOrder(orders))
-                .flatMap(orders -> {
-                    final Flux<Products> dtoOrderProducts = productsHelperService.saveProducts(orders.getId(), orders.getStatus(), request);
-
-                    return Mono.just(new DtoOrderProducts().setProductsFlux(dtoOrderProducts).setOrders(orders));
-                })
-                .flatMap(TransformServiceToAPi::transformToApi);
-
+                .flatMap(orders -> productsHelperService.saveAllProducts(orders.getId(), orders.getStatus(), request)
+                        .collectList()
+                        .flatMapMany(Flux::fromIterable)
+                        .collectList()
+                        .flatMap(products -> orderProductService.updateTotalAmount(orders.getId())
+                                .flatMap(TransformServiceToAPi::transformToApi)));
 
     }
 
@@ -79,6 +82,27 @@ public class OrderService implements IOrderService {
 
                 })
                 .flatMap(TransformServiceToAPi::transformToApi);
+    }
+
+    @Override
+    public Mono<Void> deleteOrder(String idOrder) {
+
+
+
+        if (!isNumeric(idOrder)) {
+            return Mono.error(new ParrotExceptions(PARR_REST_ORD_023.getCode(), PARR_REST_ORD_023.getMessage(), HttpStatus.BAD_REQUEST));
+        }
+
+        final Long longIdOrder = Long.valueOf(idOrder);
+
+
+        return ordersService.existsById(longIdOrder.intValue())
+                .flatMap(exist -> productsHelperService.deleteAllProductsByOrderId(longIdOrder.intValue())
+                        .flatMapMany(aVoid -> Subscriber::onComplete)
+                        .collectList()
+                        .flatMap(objects -> ordersService.deleteOrders(longIdOrder.intValue())));
+
+
     }
 
 
@@ -138,6 +162,9 @@ public class OrderService implements IOrderService {
         });
 
     }
+
+
+
 
 
 }

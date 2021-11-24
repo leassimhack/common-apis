@@ -3,20 +3,24 @@ package mx.parrot.commonapis.transform;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import mx.parrot.commonapis.dao.entity.Orders;
+import mx.parrot.commonapis.dao.entity.Products;
 import mx.parrot.commonapis.model.Amount;
 import mx.parrot.commonapis.model.Customer;
 import mx.parrot.commonapis.model.DtoOrderProducts;
 import mx.parrot.commonapis.model.Order;
-import mx.parrot.commonapis.model.OrderRequest;
 import mx.parrot.commonapis.model.OrderResponse;
-import mx.parrot.commonapis.model.ParrotRequest;
 import mx.parrot.commonapis.model.Product;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+
+import static mx.parrot.commonapis.util.ConstantsEnum.CREATED;
+import static mx.parrot.commonapis.util.ConstantsEnum.UPDATED;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class TransformServiceToAPi {
@@ -70,6 +74,28 @@ public class TransformServiceToAPi {
             return Mono.just(orderResponse);
 
         });
+
+    }
+
+    public static Product transformProductToApi(final Products product) {
+
+        Product p = new Product();
+
+        p.setId(product.getId());
+        p.setName(product.getName());
+        p.setQuantity(product.getQuantity());
+        p.setAmount(new Amount().setValue(BigDecimal.valueOf(product.getAmount()))
+                .setCurrency(product.getCurrency())
+        );
+        p.setCreate_time(product.getCreatedTime());
+        p.setStatus(product.getStatus());
+
+        p.setUpdate_time(Optional.of(product)
+                .map(Products::getUpdateTime)
+                .orElse(null));
+
+
+        return p;
 
     }
 

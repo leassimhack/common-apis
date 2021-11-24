@@ -16,7 +16,7 @@ public enum ErrorCodes {
 
     PARR_REST_ORD_003("PARR_REST_ORD_003", "Error, the field 'customer.full_name' must not be null"),
 
-    //PARR_REST_ORD_004("PARR_REST_ORD_004", "Error, the field 'customer.last_name' must not be null"),
+    PARR_REST_ORD_004("PARR_REST_ORD_004", "Error, the product id  dont exist"),
 
     PARR_REST_ORD_005("PARR_REST_ORD_005", "Error, the field 'order.total_amount.value' must not be null"),
 
@@ -54,7 +54,27 @@ public enum ErrorCodes {
 
     PARR_REST_ORD_022("PARR_REST_ORD_022", "Error, the order id  dont exist"),
 
-    PARR_REST_ORD_023("PARR_REST_ORD_023", " the value of path param '{order_id}' is incorrect");
+    PARR_REST_ORD_023("PARR_REST_ORD_023", " the value of path param '{order_id}' is incorrect"),
+
+    PARR_REST_ORD_024("PARR_REST_ORD_024", " the value of path param '{product_id}' is incorrect"),
+
+    PARR_REST_ORD_025("PARR_REST_ORD_025", "Error, the field 'name' must not be null"),
+
+    PARR_REST_ORD_026("PARR_REST_ORD_026", "Error, the field 'quantity' must not be null"),
+
+    PARR_REST_ORD_027("PARR_REST_ORD_027", "Error, the value to the field 'quantity' is incorrect"),
+
+    PARR_REST_ORD_028("PARR_REST_ORD_028", "Error, the field 'amount.value' must not be null"),
+
+    PARR_REST_ORD_029("PARR_REST_ORD_029", "Error, the value to the field 'amount.value' is incorrect"),
+
+    PARR_REST_ORD_030("PARR_REST_ORD_030", "Error, the field 'amount.currency' must not be null"),
+
+    PARR_REST_ORD_031("PARR_REST_ORD_031", "Error, this register is already exists to this order, please validate your information"),
+
+    PARR_REST_ORD_032("PARR_REST_ORD_032", "Error, the value of field 'amount.currency' is incorrect"),
+
+    PARR_REST_ORD_033("PARR_REST_ORD_033", "Error, the value of field 'order.products[].amount.currency' is incorrect");
 
     private String code;
 

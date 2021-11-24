@@ -36,7 +36,7 @@ public class Orders implements Persistable<Integer> {
     @Transient
     public boolean isNew() {
 
-        return  status.equals("CREATED");
+        return status.equals("CREATED");
     }
 
 }

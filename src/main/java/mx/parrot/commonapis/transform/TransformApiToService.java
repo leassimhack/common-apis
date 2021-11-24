@@ -28,9 +28,6 @@ public class TransformApiToService {
         headers.put(X_PARROT_DEVICE.getValue(), xParrotDevice);
 
 
-
-
-
         return Mono.just(new ParrotRequest<OrderRequest>()
                 .setBody(orderRequest)
                 .setHeaders(headers)

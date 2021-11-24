@@ -20,9 +20,9 @@ public class ParrotRequest<T> implements Serializable {
 
     private T body;
 
-    private Map<String,String> headers;
+    private Map<String, String> headers;
 
-    private Map<String,String> params;
+    private Map<String, String> params;
 
     private Integer userId;
 

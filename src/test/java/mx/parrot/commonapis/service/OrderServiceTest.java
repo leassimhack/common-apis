@@ -24,19 +24,16 @@ import java.util.Map;
 
 import static mx.parrot.commonapis.exception.ErrorCodes.PARR_REST_ORD_001;
 import static mx.parrot.commonapis.exception.ErrorCodes.PARR_REST_ORD_002;
-
 import static mx.parrot.commonapis.exception.ErrorCodes.PARR_REST_ORD_003;
-import static mx.parrot.commonapis.exception.ErrorCodes.PARR_REST_ORD_005;
-import static mx.parrot.commonapis.exception.ErrorCodes.PARR_REST_ORD_006;
 import static mx.parrot.commonapis.exception.ErrorCodes.PARR_REST_ORD_007;
 import static mx.parrot.commonapis.exception.ErrorCodes.PARR_REST_ORD_008;
 import static mx.parrot.commonapis.exception.ErrorCodes.PARR_REST_ORD_009;
 import static mx.parrot.commonapis.exception.ErrorCodes.PARR_REST_ORD_010;
-import static mx.parrot.commonapis.exception.ErrorCodes.PARR_REST_ORD_013;
 import static mx.parrot.commonapis.exception.ErrorCodes.PARR_REST_ORD_014;
 import static mx.parrot.commonapis.exception.ErrorCodes.PARR_REST_ORD_020;
 import static mx.parrot.commonapis.exception.ErrorCodes.PARR_REST_ORD_022;
 import static mx.parrot.commonapis.exception.ErrorCodes.PARR_REST_ORD_023;
+import static mx.parrot.commonapis.factory.CommonApisFactory.getDtoOrderProducts;
 import static mx.parrot.commonapis.factory.CommonApisFactory.getOrdersDao;
 import static mx.parrot.commonapis.factory.CommonApisFactory.getParrotRequest;
 import static mx.parrot.commonapis.factory.CommonApisFactory.getProductsDao;
@@ -61,6 +58,9 @@ class OrderServiceTest {
 
     @Mock
     private UserHelperService userHelperService;
+
+    @Mock
+    private OrderProductService orderProductService;
 
     @BeforeEach
     void setUp() {
@@ -118,14 +118,14 @@ class OrderServiceTest {
     }
 
 
-
     @Test
     void updateOrder_when_id_order_dont_exist_createToNew() {
 
         when(ordersHelperService.getOrder(any())).thenReturn(Mono.empty());
         when(ordersHelperService.createOrUpdateOrder(any())).thenReturn(Mono.just(getOrdersDao()));
-        when(productsHelperService.saveProducts(any(), any(), any())).thenReturn(Flux.just(getProductsDao()));
+        when(productsHelperService.saveAllProducts(any(), any(), any())).thenReturn(Flux.just(getProductsDao()));
         when(userHelperService.existsById(anyInt())).thenReturn(Mono.just(true));
+        when(orderProductService.updateTotalAmount(anyInt())).thenReturn(Mono.just(getDtoOrderProducts()));
 
         StepVerifier.create(orderService.updateOrder(getParrotRequest()))
                 .assertNext(Assertions::assertNotNull).verifyComplete();
@@ -138,12 +138,48 @@ class OrderServiceTest {
         when(userHelperService.existsById(any())).thenReturn(Mono.just(true));
         when(ordersHelperService.getOrder(any())).thenReturn(Mono.just(getOrdersDao()));
         when(ordersHelperService.createOrUpdateOrder(any())).thenReturn(Mono.just(getOrdersDao()));
-        when(productsHelperService.saveProducts(any(), any(), any())).thenReturn(Flux.just(getProductsDao()));
+        when(productsHelperService.saveAllProducts(any(), any(), any())).thenReturn(Flux.just(getProductsDao()));
+        when(orderProductService.updateTotalAmount(anyInt())).thenReturn(Mono.just(getDtoOrderProducts()));
 
 
         StepVerifier.create(orderService.updateOrder(getParrotRequest()))
                 .assertNext(Assertions::assertNotNull).verifyComplete();
 
+
+    }
+
+    @Test
+    void deleteOrder_when_id_order_exist__expectedOK() {
+
+        when(ordersHelperService.existsById(any())).thenReturn(Mono.just(true));
+        when(productsHelperService.deleteAllProductsByOrderId(any())).thenReturn(Mono.empty());
+        when(ordersHelperService.deleteOrders(anyInt())).thenReturn(Mono.empty());
+
+        StepVerifier.create(orderService.deleteOrder("1"))
+                .verifyComplete();
+
+    }
+
+
+    @Test
+    void deleteOrder_when_id_order__dont_exist_expectException() {
+
+        when(ordersHelperService.existsById(any())).thenReturn(Mono.error(new ParrotExceptions(PARR_REST_ORD_022.getCode(),PARR_REST_ORD_022.getMessage(),NOT_FOUND)));
+
+        StepVerifier.create(orderService.deleteOrder("1"))
+                .expectErrorMatches(throwable -> throwable instanceof ParrotExceptions &&
+                        ((ParrotExceptions) throwable).getCode().equals(PARR_REST_ORD_022.getCode()))
+                .verify();
+
+    }
+
+    @Test
+    void deleteOrder_when_id_order_isNot_numeric_expectException() {
+
+        StepVerifier.create(orderService.deleteOrder("1312rere3"))
+                .expectErrorMatches(throwable -> throwable instanceof ParrotExceptions &&
+                        ((ParrotExceptions) throwable).getCode().equals(PARR_REST_ORD_023.getCode()))
+                .verify();
 
     }
 
@@ -160,47 +196,6 @@ class OrderServiceTest {
 
     }
 
-    @Test
-    void createUser_when_Total_amount_value_is_null_expectedException() {
-
-        final Order order = getParrotRequest().getBody().getOrder().setTotal_amount(new Amount().setCurrency("MXN"));
-
-        final OrderRequest req = getParrotRequest().getBody().setOrder(order);
-
-        StepVerifier.create(orderService.updateOrder(getParrotRequest().setBody(req)))
-                .expectErrorMatches(throwable -> throwable instanceof ParrotExceptions &&
-                        ((ParrotExceptions) throwable).getCode().equals(PARR_REST_ORD_005.getCode()))
-                .verify();
-
-    }
-
-    @Test
-    void createUser_when_Total_amount_currency_is_null_expectedException() {
-
-        final Order order = getParrotRequest().getBody().getOrder().setTotal_amount(new Amount().setValue(BigDecimal.valueOf(1)));
-
-        final OrderRequest req = getParrotRequest().getBody().setOrder(order);
-
-        StepVerifier.create(orderService.updateOrder(getParrotRequest().setBody(req)))
-                .expectErrorMatches(throwable -> throwable instanceof ParrotExceptions &&
-                        ((ParrotExceptions) throwable).getCode().equals(PARR_REST_ORD_006.getCode()))
-                .verify();
-
-    }
-
-    @Test
-    void createUser_when_Total_amount_value_is_minor_or_equal_to_zero_expectedException() {
-
-        final Order order = getParrotRequest().getBody().getOrder().setTotal_amount(new Amount().setCurrency("MXN").setValue(BigDecimal.valueOf(0)));
-
-        final OrderRequest req = getParrotRequest().getBody().setOrder(order);
-
-        StepVerifier.create(orderService.updateOrder(getParrotRequest().setBody(req)))
-                .expectErrorMatches(throwable -> throwable instanceof ParrotExceptions &&
-                        ((ParrotExceptions) throwable).getCode().equals(PARR_REST_ORD_013.getCode()))
-                .verify();
-
-    }
 
     @Test
     void createUser_when_product_name_is_null_expectedException() {

@@ -23,7 +23,6 @@ import java.time.LocalDateTime;
 public class Products implements Persistable<Integer> {
 
 
-
     @Id
     @GeneratedValue(strategy = GenerationType.TABLE)
     private Integer id;
@@ -42,7 +41,7 @@ public class Products implements Persistable<Integer> {
     @Transient
     public boolean isNew() {
 
-        return  status.equals("CREATED");
+        return status.equals("CREATED");
     }
 
 }

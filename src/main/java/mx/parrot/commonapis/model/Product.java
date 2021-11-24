@@ -8,6 +8,7 @@ import lombok.ToString;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 
 @Getter
@@ -18,7 +19,7 @@ import java.io.Serializable;
 public class Product implements Serializable {
 
     private static final long serialVersionUID = -1808573319388569406L;
-    
+
     @JsonProperty("id_product")
     private Integer id;
 
@@ -30,5 +31,14 @@ public class Product implements Serializable {
 
     @JsonProperty("amount")
     private Amount amount;
+
+    @JsonProperty("status")
+    private String status;
+
+    @JsonProperty("create_time")
+    private LocalDateTime create_time;
+
+    @JsonProperty("update_time")
+    private LocalDateTime update_time;
 
 }

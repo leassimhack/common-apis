@@ -2,11 +2,6 @@ package mx.parrot.commonapis.service;
 
 import mx.parrot.commonapis.dao.entity.Products;
 import mx.parrot.commonapis.exception.ParrotExceptions;
-import mx.parrot.commonapis.model.Amount;
-import mx.parrot.commonapis.model.Customer;
-import mx.parrot.commonapis.model.Order;
-import mx.parrot.commonapis.model.OrderRequest;
-import mx.parrot.commonapis.model.Product;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,36 +14,19 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-
-import static mx.parrot.commonapis.exception.ErrorCodes.PARR_REST_ORD_001;
-import static mx.parrot.commonapis.exception.ErrorCodes.PARR_REST_ORD_002;
-import static mx.parrot.commonapis.exception.ErrorCodes.PARR_REST_ORD_003;
-import static mx.parrot.commonapis.exception.ErrorCodes.PARR_REST_ORD_005;
-import static mx.parrot.commonapis.exception.ErrorCodes.PARR_REST_ORD_006;
-import static mx.parrot.commonapis.exception.ErrorCodes.PARR_REST_ORD_007;
-import static mx.parrot.commonapis.exception.ErrorCodes.PARR_REST_ORD_008;
-import static mx.parrot.commonapis.exception.ErrorCodes.PARR_REST_ORD_009;
-import static mx.parrot.commonapis.exception.ErrorCodes.PARR_REST_ORD_010;
-import static mx.parrot.commonapis.exception.ErrorCodes.PARR_REST_ORD_013;
-import static mx.parrot.commonapis.exception.ErrorCodes.PARR_REST_ORD_014;
-import static mx.parrot.commonapis.exception.ErrorCodes.PARR_REST_ORD_020;
 import static mx.parrot.commonapis.exception.ErrorCodes.PARR_REST_ORD_022;
 import static mx.parrot.commonapis.exception.ErrorCodes.PARR_REST_ORD_023;
-import static mx.parrot.commonapis.factory.CommonApisFactory.getOrdersDao;
-import static mx.parrot.commonapis.factory.CommonApisFactory.getParrotRequest;
+import static mx.parrot.commonapis.exception.ErrorCodes.PARR_REST_ORD_024;
+import static mx.parrot.commonapis.exception.ErrorCodes.PARR_REST_ORD_031;
+import static mx.parrot.commonapis.factory.CommonApisFactory.getDtoOrderProducts;
+import static mx.parrot.commonapis.factory.CommonApisFactory.getProduct;
 import static mx.parrot.commonapis.factory.CommonApisFactory.getProductsDao;
 import static mx.parrot.commonapis.factory.CommonApisFactory.getProductsList;
-import static mx.parrot.commonapis.util.ConstantsEnum.X_PARROT_CLIENT_ID;
-import static mx.parrot.commonapis.util.ConstantsEnum.X_PARROT_DEVICE;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
+import static org.springframework.http.HttpStatus.CONFLICT;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 @ExtendWith(MockitoExtension.class)
@@ -60,6 +38,12 @@ class ProductServiceTest {
     @Mock
     private ProductsHelperService productsHelperService;
 
+    @Mock
+    private OrdersHelperService ordersHelperService;
+
+    @Mock
+    private OrderProductService orderProductService;
+
 
     @BeforeEach
     void setUp() {
@@ -68,21 +52,96 @@ class ProductServiceTest {
     }
 
     @Test
-    void createOrder_when_id_order_dont_exist_expectedIdOrder() {
+    void getProductReport_when_parameters_isOk() {
 
 
         Flux<Products> flux = getProductsList()
                 .flatMapMany(Flux::fromIterable);
 
-        when(productsHelperService.getProducts(anyString(),anyString())).thenReturn(flux);
+        when(productsHelperService.getProducts(anyString(), anyString())).thenReturn(flux);
 
 
-        StepVerifier.create(productService.getProductReport("1","2021-12-10","2021-23-11"))
+        StepVerifier.create(productService.getProductReport("1", "2021-12-10", "2021-23-11"))
                 .assertNext(Assertions::assertNotNull
                 ).verifyComplete();
 
     }
 
 
+    @Test
+    void deleteProduct_when_parameters_is_correct_ExpectedOk() {
+
+
+        when(ordersHelperService.existsById(any())).thenReturn(Mono.just(true));
+        when(productsHelperService.deleteProduct(anyInt())).thenReturn(Mono.empty());
+        when(orderProductService.updateTotalAmount(anyInt())).thenReturn(Mono.just(getDtoOrderProducts()));
+
+        StepVerifier.create(productService.deleteProduct("1", "1"))
+                .verifyComplete();
+
+    }
+
+
+    @Test
+    void deleteProduct_when_id_order_is_not_numeric_expectedException() {
+
+        StepVerifier.create(productService.deleteProduct("1oo", "1"))
+                .expectErrorMatches(throwable -> throwable instanceof ParrotExceptions &&
+                        ((ParrotExceptions) throwable).getCode().equals(PARR_REST_ORD_023.getCode()))
+                .verify();
+
+    }
+
+    @Test
+    void deleteProduct_when_id_product_is_not_numeric_expectedException() {
+
+        StepVerifier.create(productService.deleteProduct("1", "100o"))
+                .expectErrorMatches(throwable -> throwable instanceof ParrotExceptions &&
+                        ((ParrotExceptions) throwable).getCode().equals(PARR_REST_ORD_024.getCode()))
+                .verify();
+
+    }
+
+    @Test
+    void saveProduct_happyPad() {
+
+        when(ordersHelperService.existsById(any())).thenReturn(Mono.just(true));
+        when(productsHelperService.findAllByNameAndIdOrder(any(), any())).thenReturn(Mono.just(true));
+
+        when(productsHelperService.saveProduct(any())).thenReturn(Mono.just(getProductsDao()));
+        when(orderProductService.updateTotalAmount(anyInt())).thenReturn(Mono.just(getDtoOrderProducts()));
+
+        StepVerifier.create(productService.saveProduct(getProduct(), "1"))
+                .assertNext(Assertions::assertNotNull)
+                .verifyComplete();
+
+    }
+
+    @Test
+    void saveProduct_when_order_id_not_exist_expectedException() {
+
+        when(ordersHelperService.existsById(anyInt())).thenReturn(Mono.error(new ParrotExceptions(PARR_REST_ORD_022.getCode(), PARR_REST_ORD_022.getMessage(), NOT_FOUND)));
+
+
+        StepVerifier.create(productService.saveProduct(getProduct(), "1"))
+                .expectErrorMatches(throwable -> throwable instanceof ParrotExceptions &&
+                        ((ParrotExceptions) throwable).getCode().equals(PARR_REST_ORD_022.getCode()))
+                .verify();
+
+
+    }
+
+    @Test
+    void saveProduct_but_name_product_exist_expectedException() {
+
+        when(ordersHelperService.existsById(any())).thenReturn(Mono.just(true));
+        when(productsHelperService.findAllByNameAndIdOrder(any(), any())).thenReturn(Mono.error(new ParrotExceptions(PARR_REST_ORD_031.getCode(), PARR_REST_ORD_031.getMessage(), CONFLICT)));
+
+        StepVerifier.create(productService.saveProduct(getProduct(), "1"))
+                .expectErrorMatches(throwable -> throwable instanceof ParrotExceptions &&
+                        ((ParrotExceptions) throwable).getCode().equals(PARR_REST_ORD_031.getCode()))
+                .verify();
+
+    }
 
 }

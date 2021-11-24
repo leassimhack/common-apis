@@ -18,7 +18,7 @@ public interface IProductController {
     @RequestMapping(value = "/products/report",
             produces = {MediaType.APPLICATION_PDF_VALUE},
             method = RequestMethod.GET)
-    Mono<ResponseEntity<InputStreamResource>> createOrder(
+    Mono<ResponseEntity<InputStreamResource>> createReport(
             @RequestHeader(value = "X-Parrot-Client-Id", required = false) String xParrotClientId,
             @RequestHeader(value = "Authorization", required = false) String authorization,
             @RequestHeader(value = "X-B3-TraceId", required = false) String xB3TraceId,

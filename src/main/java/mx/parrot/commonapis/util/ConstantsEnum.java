@@ -17,7 +17,11 @@ public enum ConstantsEnum {
 
     CREATED("CREATED"),
 
-    UPDATED("UPDATED");
+    UPDATED("UPDATED"),
+
+    CURRENCY_XXX("XXX"),
+
+    CURRENCY_XTS("XTS");
 
 
     private String value;
